@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-width=1.0">
+  <title>AliGalipHub</title>
+  
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Black+Ops+One&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Pixelify+Sans:wght@400..700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+  <!-- Mobile Drag & Drop Support -->
+  <script src="https://bernardo-castilho.github.io/DragDropTouch/DragDropTouch.js"></script>
+  
+  <style>
+    @font-face {
+      font-family: 'Floppy Disk';
+      src: url('/assets/fonts/FloppyDisk.ttf') format('truetype');
+    }
+    body {
+      background-color: #ffffff;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      box-sizing: border-box;
+      transition: background-color 0.3s;
+      font-family: "Pixelify Sans", "Press Start 2P", sans-serif;
+      position: relative;
+    }
+    
+    body.dark-mode {
+      background-color: #121212;
+      color: #ffffff;
+    }
+
+    .logo {
+      position: absolute;
+      top: 30px;
+      left: 20px;
+      width: 50px;
+      height: 50px;
+      object-fit: cover;
+      border-radius: 5px;
+    }
+
+    .top-right-controls {
+      position: absolute;
+      top: 10px;
+      right: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 15px;
+      z-index: 10;
+    }
+    
+    .control-row {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 14px;
+    }
+
+    .reader-container {
+      margin-top: 10px;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .reader-container img {
+      width: 150px;
+      pointer-events: none;
+    }
+    
+    .reader-container.drag-over {
+      outline: 2px dashed #000;
+    }
+    
+    body.dark-mode .reader-container.drag-over {
+      outline-color: #fff;
+    }
+
+    .main-content {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding-top: 30px;
+      padding-bottom: 10px;
+      text-align: center;
+    }
+    
+    h1 {
+      font-size: 3rem;
+      margin: 0;
+      font-weight: bold;
+    }
+    
+    p.subtitle {
+      font-size: 1.2rem;
+      margin-top: 5px;
+      margin-bottom: 40px;
+      color: #666;
+    }
+    
+    body.dark-mode p.subtitle {
+      color: #aaa;
+    }
+    
+    body.dark-mode #language-select {
+      background: #1e1e1e;
+      color: #fff;
+      border-color: #333;
+    }
+    
+    /* Disket Kutusu (Arşiv) */
+    .archive-box {
+      background-color: #f0f0f0;
+      border-radius: 8px;
+      border: 2px solid #ccc;
+      border-bottom: 5px solid #aaa;
+      border-right: 5px solid #aaa;
+      box-shadow: inset 0px 5px 15px rgba(0,0,0,0.05), 0 10px 20px rgba(0,0,0,0.05);
+      padding: 40px 30px;
+      margin: 0 auto;
+      max-width: 800px;
+      position: relative;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 30px;
+      justify-content: center;
+    }
+
+    body.dark-mode .archive-box {
+      background-color: #1e1e1e;
+      border-color: #333;
+      border-bottom-color: #111;
+      border-right-color: #111;
+      box-shadow: inset 0px 5px 15px rgba(0,0,0,0.5), 0 10px 20px rgba(0,0,0,0.5);
+    }
+
+    .archive-label {
+      position: absolute;
+      top: -15px;
+      left: 30px;
+      background: #ffffff;
+      padding: 2px 15px;
+      font-weight: bold;
+      color: #555;
+      border: 2px solid #ccc;
+      border-radius: 4px;
+      font-size: 14px;
+      letter-spacing: 1px;
+    }
+
+    body.dark-mode .archive-label {
+      background: #121212;
+      color: #aaa;
+      border-color: #333;
+    }
+
+    .floppy-wrapper {
+      position: relative;
+      width: 120px;
+      height: 120px;
+      cursor: grab;
+      transition: transform 0.2s;
+    }
+    
+    .floppy-wrapper:active {
+      cursor: grabbing;
+    }
+    
+    .floppy-wrapper:hover {
+      transform: scale(1.05) translateY(-5px);
+    }
+    
+    .floppy-img {
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+    
+    .floppy-label {
+      position: absolute;
+      top: 35%;
+      left: 15%;
+      width: 70%;
+      height: 45%;
+      background: transparent;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      pointer-events: none;
+      transform: rotate(-2deg);
+    }
+    
+    .floppy-title {
+      font-family: 'Caveat', cursive;
+      font-size: 14px;
+      font-weight: bold;
+      color: #000;
+      line-height: 1.1;
+      margin-top: 15px;
+      white-space: normal;
+      word-wrap: break-word;
+      max-height: 32px;
+      overflow: hidden;
+      padding: 0 5px;
+    }
+    
+    .floppy-slogan {
+      font-family: 'Caveat', cursive;
+      font-size: 14px;
+      color: #333;
+      line-height: 1;
+      margin-top: 5px;
+    }
+
+    /* App Viewer */
+    #app-viewer {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      z-index: 1000;
+      background: #000;
+    }
+    
+    #app-iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      background: #fff;
+      display: block;
+    }
+
+    .reader-container.broken {
+      opacity: 0.5;
+      pointer-events: none;
+      filter: sepia(1) hue-rotate(-50deg) saturate(3);
+    }
+    
+    /* Eject Button Retro Style */
+    #eject-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      z-index: 1001;
+      padding: 10px 20px;
+      background: #d3d3d3; /* Retro plastic gray */
+      color: #000;
+      border: 4px solid #fff;
+      border-bottom-color: #888;
+      border-right-color: #888;
+      font-family: 'VT323', monospace;
+      font-size: 24px;
+      cursor: pointer;
+      box-shadow: 2px 2px 0px #000;
+      text-transform: uppercase;
+    }
+    
+    #eject-btn:active {
+      border-top-color: #888;
+      border-left-color: #888;
+      border-bottom-color: #fff;
+      border-right-color: #fff;
+      transform: translate(2px, 2px);
+      box-shadow: none;
+    }
+
+      /* Mobile Layout - Dynamic Island Style */
+    @media (max-width: 768px) {
+      .top-right-controls {
+        position: fixed;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        right: auto;
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        padding: 10px 20px;
+        border-radius: 0 0 25px 25px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        z-index: 999;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 80%;
+        max-width: 300px;
+      }
+      
+      body.dark-mode .top-right-controls {
+        background: rgba(18, 18, 18, 0.8);
+        box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+      }
+
+      .logo {
+        position: static !important;
+        margin: 20px auto;
+        text-align: center;
+        width: 100% !important;
+      }
+
+      .main-content {
+        padding-top: 150px;
+      }
+
+      .archive-box {
+        flex-direction: column;
+        align-items: center;
+        gap: 25px;
+        padding: 40px 15px;
+      }
+
+      .floppy-wrapper {
+        margin: 0 auto;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="logo" id="site-logo" style="font-family: 'Black Ops One', cursive; font-size: 30px; line-height: 50px; text-shadow: 2px 2px 0px #aaa; position: relative;">AGHub</div>
+  
+  <div class="top-right-controls">
+
+    
+    <div style="display: flex; flex-direction: row; align-items: center; gap: 20px;">
+      <!-- Theme Toggle Button -->
+      <button id="theme-toggle" style="background: transparent; border: none; cursor: pointer; color: inherit; transition: transform 0.2s; display: flex; align-items: center; justify-content: center; padding: 0;" onmouseover="this.style.transform='scale(1.1)';" onmouseout="this.style.transform='scale(1)';" >
+        <span class="material-symbols-outlined" id="theme-icon" style="font-size: 36px;">light_mode</span>
+      </button>
+
+      <div style="display: flex; flex-direction: column; align-items: center;">
+        <div class="reader-container" 
+             id="reader-container" 
+             ondrop="dropHandler(event)" 
+             ondragover="dragOverHandler(event)" 
+             ondragleave="dragLeaveHandler(event)"
+             onclick="ejectDisc()">
+          <img src="/assets/discs/disc-reader.png" id="reader-img" alt="Disc Reader">
+        </div>
+        
+      <div id="broken-text" style="color: red; font-family: 'Press Start 2P', monospace; font-size: 10px; margin-top: 10px; display: none; text-align: center; max-width: 150px; line-height: 1.4; text-shadow: 1px 1px 0px #000;"><span id="t-broken">Eyvah, disk bozuldu, düzeltmek için sayfayı yenileyin</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-content">
+    <h1 style="font-family: 'Black Ops One', cursive; font-size: 4rem; letter-spacing: 2px;"><span style="font-family: 'Floppy Disk', sans-serif;">A</span>li<span style="font-family: 'Floppy Disk', sans-serif;">G</span>alip<span style="font-family: 'Floppy Disk', sans-serif;">H</span>ub</h1>
+    <p class="subtitle" id="t-subtitle">Ali Galip'ten bir sürü proje</p>
+    
+    <div class="archive-box">
+      <div class="archive-label" id="t-archive">PROJE ARŞİVİ</div>
+      <div id="discs-container" style="display: flex; flex-wrap: wrap; gap: 30px; justify-content: center; width: 100%;">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+  </div>
+
+
+  <select id="language-select" style="position: fixed; bottom: 20px; right: 20px; padding: 10px; font-family: 'Pixelify Sans', sans-serif; font-size: 16px; background: #fff; color: #000; border: 2px solid #ccc; cursor: pointer; z-index: 999; border-radius: 5px;">
+    <option value="en">English</option>
+    <option value="zh">中文 (Mandarin)</option>
+    <option value="hi">हिन्दी (Hindi)</option>
+    <option value="es">Español</option>
+    <option value="fr">Français</option>
+    <option value="ar">العربية (Arabic)</option>
+    <option value="bn">বাংলা (Bengali)</option>
+    <option value="ru">Русский</option>
+    <option value="pt">Português</option>
+    <option value="ur">اردو (Urdu)</option>
+    <option value="id">Bahasa Indonesia</option>
+    <option value="de">Deutsch</option>
+    <option value="ja">日本語 (Japanese)</option>
+    <option value="mr">मराठी (Marathi)</option>
+    <option value="tr">Türkçe</option>
+  </select>
+
+
+  
+
+
+  <div class="feedback-section" style="margin-top: 20px; margin-bottom: 0;">
+    <div style="display:flex; justify-content:center; gap: 30px;">
+      <div class="floppy-wrapper" draggable="true" id="disc-idk15052007" style="cursor: grab;">
+        <img src="/assets/discs/floppy-disc.png" class="floppy-img" alt="idk15052007 Disc">
+        <div class="floppy-label"><div class="floppy-title" style="font-size: 14px;">idk15052007.exe</div></div>
+      </div>
+      <div class="floppy-wrapper" draggable="true" id="disc-contact" style="cursor: grab;">
+        <img src="/assets/discs/floppy-disc.png" class="floppy-img" alt="Contact Disc">
+        <div class="floppy-label"><div class="floppy-title" style="font-size: 14px;">contact.exe</div></div>
+      </div>
+    </div>
+  </div>
+
+  
+  
+  <div id="win98-download" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #c0c0c0; border: 2px solid #000; box-shadow: 2px 2px 0px #000; width: 300px; z-index: 2000; font-family: 'Pixelify Sans', sans-serif;">
+    <div style="background: #000080; color: #fff; padding: 2px 5px; font-weight: bold; font-family: 'Press Start 2P', monospace; font-size: 10px; display: flex; justify-content: space-between;">
+      <span id="t-download-title">İndiriliyor...</span>
+      <span style="background: #c0c0c0; color: #000; border: 1px solid #fff; border-bottom-color: #888; border-right-color: #888; padding: 0 4px; cursor: pointer;" onclick="document.getElementById('win98-download').style.display='none';">X</span>
+    </div>
+    <div style="padding: 15px;">
+      <div id="download-preview" style="display: none; width: 100%; height: 100px; margin-bottom: 10px; border: 2px inset #fff; border-top-color: #888; border-left-color: #888; overflow: hidden; background: #000;">
+         <iframe id="preview-iframe" style="width: 100%; height: 100%; border: none;" src="about:blank"></iframe>
+      </div>
+      <p id="t-download-text" style="margin: 0 0 10px 0; font-size: 14px; color: #000;">Lütfen bekleyin, dosya indiriliyor...</p>
+      <div style="border: 2px inset #fff; border-top-color: #888; border-left-color: #888; height: 20px; background: #fff; position: relative;">
+        <div id="win98-progress-bar" style="background: #000080; height: 100%; width: 0%;"></div>
+      </div>
+    </div>
+  </div>
+  <!-- App Viewer -->
+  <div id="app-viewer">
+    <button id="eject-btn" onclick="ejectDisc()"><span id="t-eject">[ DİSKETİ ÇIKAR ]</span></button>
+    <div id="rickroll-trap" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #008080; z-index: 1002; flex-direction: column; align-items: center; justify-content: center; font-family: 'Pixelify Sans', sans-serif;">
+       <div style="background: #c0c0c0; border: 2px solid #fff; border-bottom-color: #000; border-right-color: #000; padding: 2px; text-align: center; max-width: 400px; box-shadow: 2px 2px 0px #000;">
+          <div style="background: #000080; color: #fff; text-align: left; padding: 3px 5px; font-family: 'Press Start 2P', monospace; font-size: 10px; font-weight: bold;">Hata</div>
+          <div style="padding: 20px;">
+            <p style="font-size: 16px; margin: 10px 0 20px 0; color: #000;">Yüklenemedi Lütfen Yeniden Deneyin.</p>
+            <button onclick="triggerRickRoll()" style="background: #c0c0c0; border: 2px outset #fff; border-bottom-color: #888; border-right-color: #888; padding: 5px 20px; font-family: 'Pixelify Sans', sans-serif; font-size: 16px; cursor: pointer; color: #000;">Yeniden Dene</button>
+          </div>
+       </div>
+    </div>
+    <iframe id="app-iframe" src="about:blank" allow="autoplay; fullscreen"></iframe>
+    <video id="app-video" src="/assets/video/rickroll.mp4" style="display: none; width: 100%; height: 100%; object-fit: contain; background: #000;" loop></video>
+  </div>
+
+  <!-- Audio Elements -->
+  <audio id="disc-audio" src="/assets/discs/disc-sound.mp3"></audio>
+  <audio id="fan-audio" src="/assets/discs/fan-sound.mp3" loop></audio>
+  <audio id="eject-audio" src="/assets/discs/floppy-eject.mp3"></audio>
+
+  <script>
+    // Projects Data (Dummy)
+
+    let projects = [
+      { id: 'awebsitespace', title: 'A WebSite Space', url: 'https://www.awebsite.space', isDownload: true },
+      { id: 'haberci', title: 'AGRSS', url: 'https://github.com/aligaliptugcu/aligaliphub/releases/download/v1.0/Haberci.zip', isDownload: true },
+      { id: 'nottasks', title: 'NotTasks', url: 'https://github.com/aligaliptugcu/aligaliphub/releases/download/v1.0/NotTasks.zip', isDownload: true },
+      { id: 'storageviewer', title: 'Storage Viewer', url: 'https://github.com/aligaliptugcu/aligaliphub/releases/download/v1.0/StorageViewer.zip', isDownload: true },
+      { id: 'turnit', title: 'TurnIt', url: 'https://github.com/aligaliptugcu/aligaliphub/releases/download/v1.0/TurnIt.zip', isDownload: true },
+      { id: 'retroclock', title: 'Retro Clock', url: '/retro-clock', isDownload: true },
+      { id: '3darm', title: '3Darm', url: '/3darm', isDownload: true }
+    ];
+    try {
+      const cp = JSON.parse(localStorage.getItem('custom_projects') || '[]');
+      if(Array.isArray(cp)) projects = projects.concat(cp);
+    } catch(e) {}
+
+    const discsContainer = document.getElementById('discs-container');
+    const readerImg = document.getElementById('reader-img');
+    const readerContainer = document.getElementById('reader-container');
+    const appViewer = document.getElementById('app-viewer');
+    const appIframe = document.getElementById('app-iframe');
+    const themeToggle = document.getElementById('theme-toggle');
+    const themeIcon = document.getElementById('theme-icon');
+    const discAudio = document.getElementById('disc-audio');
+    const fanAudio = document.getElementById('fan-audio');
+    const ejectAudio = document.getElementById('eject-audio');
+    let currentDisc = null;
+    let isBroken = false;
+
+    const translations = {
+      en: { subtitle: "A Floppy Disc collection created by Ali Galip", archive: "PROJECT ARCHIVE", eject: "[ EJECT DISC ]", broken: "Oops, disc is broken, refresh the page", alpha: "Alpha Version", fbtitle: "Feedback", fbdesc: "Insert disc into Write drive, save, then insert to Send drive.", write: "Write", send: "Send", cat: "Category:", msg: "Message:", save: "SAVE & EJECT", dl_title: "Downloading...", dl_text: "Please wait, downloading file...", empty_disc: "EMPTY DISC", full_disc: "FULL DISC", status_sending: "Sending...", status_sent: "Process Complete" },
+      tr: { subtitle: "Ali Galip'ten bir sürü proje", archive: "PROJE ARŞİVİ", eject: "[ DİSKETİ ÇIKAR ]", broken: "Eyvah, disk bozuldu, düzeltmek için sayfayı yenileyin", alpha: "Alpha Sürümü", fbtitle: "Geri Bildirim", fbdesc: "Diski 'Üzerine Yaz' sürücüsüne takıp kaydedin, ardından 'Gönder' sürücüsüyle iletin.", write: "Üzerine Yaz", send: "Gönder", cat: "Kategori:", msg: "Mesaj:", save: "KAYDET & ÇIKAR", dl_title: "İndiriliyor...", dl_text: "Lütfen bekleyin, dosya indiriliyor...", empty_disc: "BOS DISK", full_disc: "DOLU DISK", status_sending: "İletiliyor...", status_sent: "İşlem Tamamlandı" },
+      zh: { subtitle: "Ali Galip的许多项目", archive: "项目档案", eject: "[ 弹出磁盘 ]", broken: "哎呀，磁盘损坏了，请刷新页面", alpha: "Alpha版本", fbtitle: "反馈", fbdesc: "将磁盘插入写入驱动器，保存，然后插入发送驱动器。", write: "写入", send: "发送", cat: "类别：", msg: "消息：", save: "保存并弹出", dl_title: "下载中...", dl_text: "请稍候，文件正在下载...", empty_disc: "空磁盘", full_disc: "全盘", status_sending: "发送中...", status_sent: "处理完成" },
+      hi: { subtitle: "अली गालिप से कई प्रोजेक्ट", archive: "परियोजना संग्रह", eject: "[ डिस्क निकालें ]", broken: "उफ़, डिस्क टूट गई है, पृष्ठ को रीफ्रेश करें", alpha: "अल्फा संस्करण", fbtitle: "प्रतिक्रिया", fbdesc: "लिखें ड्राइव में डिस्क डालें, सहेजें, फिर भेजें ड्राइव में डालें।", write: "लिखें", send: "भेजें", cat: "श्रेणी:", msg: "संदेश:", save: "सहेजें और निकालें", dl_title: "डाउनलोड हो रहा है...", dl_text: "कृपया प्रतीक्षा करें, फ़ाइल डाउनलोड हो रही है...", empty_disc: "खाली डिस्क", full_disc: "पूर्ण डिस्क", status_sending: "भेजा जा रहा है...", status_sent: "प्रक्रिया पूरी हुई" },
+      es: { subtitle: "Muchos proyectos de Ali Galip", archive: "ARCHIVO DE PROYECTOS", eject: "[ EXPULSAR ]", broken: "Vaya, el disco está roto, actualiza la página", alpha: "Versión Alfa", fbtitle: "Comentarios", fbdesc: "Inserte el disco en la unidad Escribir, guarde, luego inserte en Enviar.", write: "Escribir", send: "Enviar", cat: "Categoría:", msg: "Mensaje:", save: "GUARDAR Y EXPULSAR", dl_title: "Descargando...", dl_text: "Por favor espere, descargando...", empty_disc: "DISCO VACÍO", full_disc: "DISCO LLENO", status_sending: "Enviando...", status_sent: "Proceso Completo" },
+      fr: { subtitle: "Beaucoup de projets d'Ali Galip", archive: "ARCHIVE DE PROJETS", eject: "[ ÉJECTER ]", broken: "Oups, le disque est cassé, actualisez", alpha: "Version Alpha", fbtitle: "Commentaires", fbdesc: "Insérez le disque dans Écrire, enregistrez, puis Envoyer.", write: "Écrire", send: "Envoyer", cat: "Catégorie:", msg: "Message:", save: "ENREGISTRER ET ÉJECTER", dl_title: "Téléchargement...", dl_text: "Veuillez patienter...", empty_disc: "DISQUE VIDE", full_disc: "DISQUE PLEIN", status_sending: "Envoi...", status_sent: "Terminé" },
+      ar: { subtitle: "الكثير من المشاريع من علي غالب", archive: "أرشيف المشاريع", eject: "[ إخراج ]", broken: "عفوًا ، القرص مكسور", alpha: "نسخة ألفا", fbtitle: "تعليقات", fbdesc: "أدخل القرص في محرك الكتابة، احفظ، ثم أرسل.", write: "كتابة", send: "إرسال", cat: "فئة:", msg: "رسالة:", save: "حفظ وإخراج", dl_title: "جار التحميل...", dl_text: "الرجاء الانتظار...", empty_disc: "قرص فارغ", full_disc: "قرص ممتلئ", status_sending: "إرسال...", status_sent: "اكتملت العملية" },
+      bn: { subtitle: "আলী গালিপ থেকে অনেক প্রকল্প", archive: "প্রকল্প সংরক্ষণাগার", eject: "[ ডিস্ক বের করুন ]", broken: "ওপস, ডিস্কটি ভেঙে গেছে", alpha: "আলফা সংস্করণ", fbtitle: "প্রতিক্রিয়া", fbdesc: "লিখুন ড্রাইভে ডিস্ক প্রবেশ করান, সংরক্ষণ করুন, তারপর পাঠান।", write: "লিখুন", send: "পাঠান", cat: "বিভাগ:", msg: "বার্তা:", save: "সংরক্ষণ করুন", dl_title: "ডাউনলোড হচ্ছে...", dl_text: "অনুগ্রহ করে অপেক্ষা করুন...", empty_disc: "খালি ডিস্ক", full_disc: "পূর্ণ ডিস্ক", status_sending: "পাঠানো হচ্ছে...", status_sent: "প্রক্রিয়া সম্পন্ন" },
+      ru: { subtitle: "Много проектов от Али Галипа", archive: "АРХИВ ПРОЕКТОВ", eject: "[ ИЗВЛЕЧЬ ]", broken: "Ой, диск сломан, обновите", alpha: "Альфа-версия", fbtitle: "Отзывы", fbdesc: "Вставьте диск в привод записи, сохраните, затем в отправку.", write: "Запись", send: "Отправка", cat: "Категория:", msg: "Сообщение:", save: "СОХРАНИТЬ", dl_title: "Загрузка...", dl_text: "Пожалуйста, подождите, загрузка...", empty_disc: "ПУСТОЙ ДИСК", full_disc: "ПОЛНЫЙ ДИСК", status_sending: "Отправка...", status_sent: "Процесс завершен" },
+      pt: { subtitle: "Muitos projetos de Ali Galip", archive: "ARQUIVO DE PROJETOS", eject: "[ EJETAR ]", broken: "Ops, o disco está quebrado", alpha: "Versão Alfa", fbtitle: "Comentários", fbdesc: "Insira o disco na unidade Gravar, salve e Enviar.", write: "Gravar", send: "Enviar", cat: "Categoria:", msg: "Mensagem:", save: "SALVAR E EJETAR", dl_title: "Baixando...", dl_text: "Por favor, aguarde...", empty_disc: "DISCO VAZIO", full_disc: "DISCO CHEIO", status_sending: "Enviando...", status_sent: "Processo Concluído" },
+      ur: { subtitle: "علی غالب کے بہت سے منصوبے", archive: "پروجیکٹ آرکائیو", eject: "[ نکالیں ]", broken: "افوہ، ڈسک ٹوٹ گئی ہے", alpha: "الفا ورژن", fbtitle: "رائے", fbdesc: "رائٹ ڈرائیو میں ڈسک ڈالیں، محفوظ کریں، پھر بھیجیں۔", write: "لکھیں", send: "بھیجیں", cat: "زمرہ:", msg: "پیغام:", save: "محفوظ کریں", dl_title: "ڈاؤن لوڈ ہو رہا ہے...", dl_text: "براہ کرم انتظار کریں...", empty_disc: "خالی ڈسک", full_disc: "بھری ہوئی ڈسک", status_sending: "بھیجا جا رہا ہے...", status_sent: "عمل مکمل" },
+      id: { subtitle: "Banyak proyek dari Ali Galip", archive: "ARSIP PROYEK", eject: "[ KELUARKAN ]", broken: "Ups, disknya rusak, segarkan", alpha: "Versi Alfa", fbtitle: "Umpan Balik", fbdesc: "Masukkan disk ke drive Tulis, simpan, lalu Kirim.", write: "Tulis", send: "Kirim", cat: "Kategori:", msg: "Pesan:", save: "SIMPAN & KELUARKAN", dl_title: "Mengunduh...", dl_text: "Harap tunggu, mengunduh file...", empty_disc: "DISK KOSONG", full_disc: "DISK PENUH", status_sending: "Mengirim...", status_sent: "Proses Selesai" },
+      de: { subtitle: "Viele Projekte von Ali Galip", archive: "PROJEKTARCHIV", eject: "[ AUSWERFEN ]", broken: "Hoppla, die Diskette ist kaputt", alpha: "Alpha-Version", fbtitle: "Feedback", fbdesc: "Diskette in Schreiblaufwerk einlegen, speichern, dann Senden.", write: "Schreiben", send: "Senden", cat: "Kategorie:", msg: "Nachricht:", save: "SPEICHERN & AUSWERFEN", dl_title: "Wird heruntergeladen...", dl_text: "Bitte warten...", empty_disc: "LEERE DISKETTE", full_disc: "VOLLE DISKETTE", status_sending: "Wird gesendet...", status_sent: "Vorgang abgeschlossen" },
+      ja: { subtitle: "アリ・ガリップの多くのプロジェクト", archive: "プロジェクトアーカイブ", eject: "[ 取り出し ]", broken: "おっと、ディスクが壊れました", alpha: "アルファ版", fbtitle: "フィードバック", fbdesc: "書き込みドライブに挿入、保存、送信に挿入。", write: "書き込み", send: "送信", cat: "カテゴリー:", msg: "メッセージ:", save: "保存して取り出し", dl_title: "ダウンロード中...", dl_text: "お待ちください...", empty_disc: "空のディスク", full_disc: "フルディスク", status_sending: "送信中...", status_sent: "処理完了" },
+      mr: { subtitle: "अली गालिप कडून बरेच प्रकल्प", archive: "प्रकल्प संग्रह", eject: "[ बाहेर काढा ]", broken: "अरेरे, डिस्क तुटली आहे", alpha: "अल्फा आवृत्ती", fbtitle: "अभिप्राय", fbdesc: "लिहा ड्राइव्हमध्ये डिस्क घाला, सेव्ह करा, नंतर पाठवा.", write: "लिहा", send: "पाठवा", cat: "श्रेणी:", msg: "संदेश:", save: "सेव्ह करा", dl_title: "डाउनलोड होत आहे...", dl_text: "कृपया प्रतीक्षा करा...", empty_disc: "रिकामी डिस्क", full_disc: "पूर्ण डिस्क", status_sending: "पाठवत आहे...", status_sent: "प्रक्रिया पूर्ण झाली" }
+    };
+
+    function updateLanguage(lang) {
+      if(!translations[lang]) return;
+      const t = translations[lang];
+      if(document.getElementById('t-subtitle')) document.getElementById('t-subtitle').textContent = t.subtitle;
+      if(document.getElementById('t-archive')) document.getElementById('t-archive').textContent = t.archive;
+      if(document.getElementById('t-eject')) document.getElementById('t-eject').textContent = t.eject;
+      if(document.getElementById('t-broken')) document.getElementById('t-broken').textContent = t.broken;
+      if(document.getElementById('t-alpha')) document.getElementById('t-alpha').textContent = t.alpha;
+
+      if(document.getElementById('t-download-title')) document.getElementById('t-download-title').textContent = t.dl_title;
+      if(document.getElementById('t-download-text')) document.getElementById('t-download-text').textContent = t.dl_text;
+      
+
+
+      localStorage.setItem('lang', lang);
+      document.getElementById('language-select').value = lang;
+    }
+    
+    function getLocalizedUrl(url) {
+      if (url.startsWith('http') || url === 'trap') return url;
+      const lang = localStorage.getItem('lang') || 'tr';
+      return `/${lang}${url.startsWith('/') ? url : '/' + url}`;
+    }
+
+    // Language routing logic
+    const pathSegments = window.location.pathname.split('/').filter(Boolean);
+    let urlLang = null;
+    
+    // Check if the first path segment is a language code
+    if (pathSegments.length > 0 && translations[pathSegments[0]]) {
+        urlLang = pathSegments[0];
+    }
+
+    let activeLang = urlLang || localStorage.getItem('lang') || 'tr';
+    
+    if (window.location.pathname === '/' || window.location.pathname === '') {
+        window.history.replaceState(null, '', '/' + activeLang + '/');
+    } else if (urlLang && urlLang !== localStorage.getItem('lang')) {
+        localStorage.setItem('lang', urlLang);
+    }
+
+    updateLanguage(activeLang);
+
+    document.getElementById('language-select').addEventListener('change', (e) => {
+      const newLang = e.target.value;
+      localStorage.setItem('lang', newLang);
+      
+      const segments = window.location.pathname.split('/').filter(Boolean);
+      if (segments.length > 0 && translations[segments[0]]) {
+          segments[0] = newLang;
+      } else {
+          segments.unshift(newLang);
+      }
+      window.location.href = '/' + segments.join('/');
+    });
+    
+    // Original JS starts here
+    // Load user preferences
+    if (localStorage.getItem('theme') === 'dark') {
+      document.body.classList.add('dark-mode');
+      themeIcon.textContent = 'dark_mode';
+    } else {
+      themeIcon.textContent = 'light_mode';
+    }
+    
+    // Toggle Dark Mode
+    themeToggle.addEventListener('click', () => {
+      document.body.classList.toggle('dark-mode');
+      const isDark = document.body.classList.contains('dark-mode');
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+      themeIcon.textContent = isDark ? 'dark_mode' : 'light_mode';
+    });
+
+    
+
+    // Render Discs
+    projects.forEach(p => {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'floppy-wrapper';
+      wrapper.draggable = true;
+      wrapper.id = 'disc-' + p.id;
+      
+      wrapper.addEventListener('dragstart', (e) => {
+        e.dataTransfer.setData('text/plain', p.id);
+        e.dataTransfer.effectAllowed = 'move';
+      });
+
+      wrapper.innerHTML = `
+        <img src="/assets/discs/floppy-disc.png" class="floppy-img" alt="Floppy Disc">
+        <div class="floppy-label">
+          <div class="floppy-title">${p.title}</div>
+        </div>
+      `;
+      discsContainer.appendChild(wrapper);
+    });
+
+
+    // Contact and Aboutme Disc Drag
+    const contactDisc = document.getElementById('disc-contact');
+    if (contactDisc) {
+      contactDisc.addEventListener('dragstart', (e) => {
+        e.dataTransfer.setData('text/plain', 'contact');
+        e.dataTransfer.effectAllowed = 'move';
+      });
+    }
+    const idkDisc = document.getElementById('disc-idk15052007');
+    if (idkDisc) {
+      idkDisc.addEventListener('dragstart', (e) => {
+        e.dataTransfer.setData('text/plain', 'idk15052007');
+        e.dataTransfer.effectAllowed = 'move';
+      });
+    }
+
+    // Drag & Drop Handlers
+    function dragOverHandler(e) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      readerContainer.classList.add('drag-over');
+    }
+    
+    function dragLeaveHandler(e) {
+      readerContainer.classList.remove('drag-over');
+    }
+
+    function dropHandler(e) {
+      e.preventDefault();
+      readerContainer.classList.remove('drag-over');
+      
+      if (isBroken) return;
+      
+      if (currentDisc) {
+        isBroken = true;
+        readerContainer.classList.add('broken');
+        document.getElementById('broken-text').style.display = 'block';
+        return;
+      }
+
+      const projectId = e.dataTransfer.getData('text/plain');
+      if (!projectId) return;
+
+      let project = projects.find(p => p.id === projectId);
+      if (projectId === 'contact') {
+         project = { id: 'contact', title: 'contact.exe', url: 'https://forms.gle/2yAQQzSyd6Gdju5S6', isDownload: true };
+      } else if (projectId === 'idk15052007') {
+         project = { id: 'idk15052007', title: 'idk15052007.exe', url: 'trap', isDownload: true };
+      }
+      if (!project) return;
+
+      // Insert Disc
+      currentDisc = projectId;
+      
+      // Hide dropped floppy
+      document.getElementById('disc-' + projectId).style.display = 'none';
+      
+      // Change reader image
+      readerImg.src = '/assets/discs/disc-reader-and-disc.png';
+
+      // Play audio sequence
+      discAudio.currentTime = 0;
+      fanAudio.currentTime = 0;
+      discAudio.play().catch(console.error);
+      
+      discAudio.onended = () => {
+        if (currentDisc) { // still inside
+          if (project.isDownload) {
+             // Show Win98 progress
+             document.getElementById('win98-download').style.display = 'block';
+             const previewDiv = document.getElementById('download-preview');
+             const previewIframe = document.getElementById('preview-iframe');
+             
+             if (project.id === 'contact') {
+                 document.getElementById('t-download-title').textContent = 'İletişim Başlatılıyor...';
+                 document.getElementById('t-download-text').textContent = 'contact.exe yükleniyor...';
+                 previewDiv.style.display = 'none';
+             } else if (project.id === 'idk15052007') {
+                 document.getElementById('t-download-title').textContent = 'Bilinmeyen Dosya...';
+                 document.getElementById('t-download-text').textContent = 'idk15052007.exe yükleniyor...';
+                 previewDiv.style.display = 'none';
+             } else if (project.id === 'retroclock') {
+                 document.getElementById('t-download-title').textContent = 'İndiriliyor...';
+                 document.getElementById('t-download-text').textContent = project.title + ' yükleniyor...';
+                 previewDiv.style.display = 'block';
+                 previewIframe.src = getLocalizedUrl(project.url);
+             } else {
+                 document.getElementById('t-download-title').textContent = 'İndiriliyor...';
+                 document.getElementById('t-download-text').textContent = project.title + ' yükleniyor...';
+                 previewDiv.style.display = 'none';
+             }
+             document.getElementById('win98-progress-bar').style.width = '0%';
+             let prog = 0;
+             let interval = setInterval(() => {
+                prog += 10;
+                document.getElementById('win98-progress-bar').style.width = prog + '%';
+                 if(prog >= 100) {
+                   clearInterval(interval);
+                   setTimeout(() => {
+                     document.getElementById('win98-download').style.display = 'none';
+                     previewIframe.src = 'about:blank'; // cleanup
+                     if (project.url === 'trap') {
+                         openApp('trap');
+                     } else {
+                         window.open(getLocalizedUrl(project.url), '_blank');
+                         ejectDisc();
+                     }
+                   }, 500);
+                }
+             }, 200);
+          } else {
+             fanAudio.play().catch(console.error);
+             openApp(getLocalizedUrl(project.url));
+          }
+        }
+      };
+    }
+
+    function ejectDisc() {
+      if (!currentDisc || isBroken) return; // No disc to eject or reader is broken
+      
+      // Play Eject Audio
+      ejectAudio.currentTime = 0;
+      ejectAudio.play().catch(console.error);
+
+      // Stop audio
+      discAudio.pause();
+      fanAudio.pause();
+      
+      // Show disc again
+      document.getElementById('disc-' + currentDisc).style.display = 'block';
+      currentDisc = null;
+
+      // Reset reader image
+      readerImg.src = '/assets/discs/disc-reader.png';
+      
+      // Close app and trap
+      appViewer.style.display = 'none';
+      document.getElementById('rickroll-trap').style.display = 'none';
+      appIframe.style.display = 'block';
+      appIframe.src = 'about:blank';
+      
+      // Stop video if it was playing
+      const appVideo = document.getElementById('app-video');
+      appVideo.pause();
+      appVideo.currentTime = 0;
+      appVideo.style.display = 'none';
+    }
+
+    function openApp(url) {
+      if (url === 'trap') {
+        appIframe.src = 'about:blank';
+        appIframe.style.display = 'none';
+        document.getElementById('app-video').style.display = 'none';
+        document.getElementById('rickroll-trap').style.display = 'flex';
+        appViewer.style.display = 'flex';
+      } else {
+        document.getElementById('rickroll-trap').style.display = 'none';
+        document.getElementById('app-video').style.display = 'none';
+        appIframe.style.display = 'block';
+        appIframe.src = url;
+        appViewer.style.display = 'flex';
+      }
+    }
+
+    function triggerRickRoll() {
+      document.getElementById('rickroll-trap').style.display = 'none';
+      appIframe.style.display = 'none';
+      
+      const appVideo = document.getElementById('app-video');
+      appVideo.style.display = 'block';
+      appVideo.play().catch(e => console.error("Auto-play failed", e));
+    }
+
+
+
+
+
+  </script>
+
+</body>
+</html>

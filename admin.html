@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin</title>
+</head>
+<body>
+  <div id="f">
+    <input type="password" id="p">
+    <button onclick="c()">Submit</button>
+  </div>
+  <div id="m" style="display:none; font-size: 8px; font-family: sans-serif;">Idiot.</div>
+  
+  <script>
+    function c() {
+      if(document.getElementById('p').value === 'adminadmin123123') {
+        document.getElementById('f').style.display = 'none';
+        document.getElementById('m').style.display = 'block';
+      } else {
+        alert("Incorrect.");
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,25 @@
+{
+  "hosting": {
+    "public": ".",
+    "cleanUrls": true,
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "/*/retro-clock",
+        "destination": "/retro-clock.html"
+      },
+      {
+        "source": "/*/3darm",
+        "destination": "/3darm.html"
+      },
+      {
+        "source": "/**",
+        "destination": "/index.html"
+      }
+    ]
+  }
+}
