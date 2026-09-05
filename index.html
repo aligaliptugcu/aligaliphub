@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-width=1.0">
+  <meta name="description" content="Ali Galip's project archive and interactive web hub.">
   <title>AliGalipHub</title>
   
   <!-- Fonts -->
@@ -14,7 +15,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
   <!-- Mobile Drag & Drop Support -->
-  <script src="https://bernardo-castilho.github.io/DragDropTouch/DragDropTouch.js"></script>
+  <script src="https://bernardo-castilho.github.io/DragDropTouch/DragDropTouch.js" defer></script>
   
   <style>
     body {
@@ -352,7 +353,7 @@
              ondragover="dragOverHandler(event)" 
              ondragleave="dragLeaveHandler(event)"
              onclick="ejectDisc()">
-          <img src="/assets/discs/disc-reader.png" id="reader-img" alt="Disc Reader">
+          <img src="/assets/discs/disc-reader.png" id="reader-img" alt="Disc Reader" width="150" height="150">
         </div>
         
       <div id="broken-text" style="color: red; font-family: 'Press Start 2P', monospace; font-size: 10px; margin-top: 10px; display: none; text-align: center; max-width: 150px; line-height: 1.4; text-shadow: 1px 1px 0px #000;"><span id="t-broken">Eyvah, disk bozuldu, düzeltmek için sayfayı yenileyin</span></div>
@@ -373,7 +374,7 @@
   </div>
 
 
-  <select id="language-select" style="position: fixed; bottom: 20px; right: 20px; padding: 10px; font-family: 'Pixelify Sans', sans-serif; font-size: 16px; background: #fff; color: #000; border: 2px solid #ccc; cursor: pointer; z-index: 999; border-radius: 5px;">
+  <select id="language-select" aria-label="Language selection" style="position: fixed; bottom: 20px; right: 20px; padding: 10px; font-family: 'Pixelify Sans', sans-serif; font-size: 16px; background: #fff; color: #000; border: 2px solid #ccc; cursor: pointer; z-index: 999; border-radius: 5px;">
     <option value="en">English</option>
     <option value="zh">中文 (Mandarin)</option>
     <option value="hi">हिन्दी (Hindi)</option>
@@ -398,11 +399,11 @@
   <div class="feedback-section" style="margin-top: 20px; margin-bottom: 0;">
     <div style="display:flex; justify-content:center; gap: 30px;">
       <div class="floppy-wrapper" draggable="true" id="disc-idk15052007" style="cursor: grab;">
-        <img src="/assets/discs/floppy-disc.png" class="floppy-img" alt="idk15052007 Disc">
+        <img src="/assets/discs/floppy-disc.png" class="floppy-img" alt="idk15052007 Disc" width="150" height="150">
         <div class="floppy-label"><div class="floppy-title" style="font-size: 14px;">idk15052007.exe</div></div>
       </div>
       <div class="floppy-wrapper" draggable="true" id="disc-contact" style="cursor: grab;">
-        <img src="/assets/discs/floppy-disc.png" class="floppy-img" alt="Contact Disc">
+        <img src="/assets/discs/floppy-disc.png" class="floppy-img" alt="Contact Disc" width="150" height="150">
         <div class="floppy-label"><div class="floppy-title" style="font-size: 14px;">contact.exe</div></div>
       </div>
     </div>
@@ -582,7 +583,7 @@
       });
 
       wrapper.innerHTML = `
-        <img src="/assets/discs/floppy-disc.png" class="floppy-img" alt="Floppy Disc">
+        <img src="/assets/discs/floppy-disc.png" class="floppy-img" alt="Floppy Disc" width="150" height="150">
         <div class="floppy-label">
           <div class="floppy-title">${p.title}</div>
         </div>
