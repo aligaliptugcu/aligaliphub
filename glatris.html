@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>GLatris</title>
+  <style>
+    body { background: #000; color: #3f3; font-family: 'VT323', monospace, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; overflow: hidden; }
+    h1 { font-size: 4rem; text-shadow: 2px 2px 0 #000; }
+    .terminal { border: 2px solid #3f3; padding: 20px; width: 80%; max-width: 600px; height: 300px; overflow-y: auto; text-align: left; background: rgba(0,255,0,0.1); }
+    #download-text { position: absolute; bottom: 20px; left: 20px; font-size: 1.5rem; color: #fff; background: #000; padding: 5px; border: 1px solid #fff; cursor: context-menu; }
+  </style>
+</head>
+<body>
+  <h1>GLatris 🤖🧱</h1>
+  <div class="terminal">
+    > INITIATING GLATRIS TESTING PROTOCOL...<br>
+    > Loading curses module... [OK]<br>
+    > Aperture Science AI Controller... [ONLINE]<br>
+    > Waiting for subject to start...<br><br>
+    (This is a console-based Python game. It cannot run directly in this primitive web browser.)
+  </div>
+  <!-- Hidden link to actual zip for right click -->
+  <a id="download-link" href="https://github.com/aligaliptugcu/aligaliphub/releases/download/v1.0/GLatris.zip" style="text-decoration: none;">
+    <div id="download-text">İndirmek isterseniz sağ tıklayıp farklı kaydet ile indirin!</div>
+  </a>
+  <script>
+    const translations = {
+      'en': 'If you want to download, right click and save as!',
+      'zh': '如果您想下载，请右键单击并另存为！',
+      'hi': 'यदि आप डाउनलोड करना चाहते हैं, तो राइट क्लिक करें और इस रूप में सहेजें!',
+      'es': '¡Si quieres descargar, haz clic derecho y guardar como!',
+      'fr': 'Si vous voulez télécharger, faites un clic droit et enregistrer sous !',
+      'tr': 'İndirmek isterseniz sağ tıklayıp farklı kaydet ile indirin!'
+    };
+    
+    // Check parent lang or localStorage
+    let lang = 'tr';
+    try {
+        if(window.parent && window.parent.localStorage) {
+            lang = window.parent.localStorage.getItem('lang') || 'tr';
+        } else {
+            lang = localStorage.getItem('lang') || 'tr';
+        }
+    } catch(e) {}
+    
+    if(translations[lang]) document.getElementById('download-text').innerText = translations[lang];
+    
+    // Listen for messages from parent in case language changes
+    window.addEventListener('message', (event) => {
+      if (event.data && event.data.type === 'LANG_CHANGE') {
+         const newLang = event.data.lang;
+         if (translations[newLang]) {
+             document.getElementById('download-text').innerText = translations[newLang];
+         }
+      }
+    });
+  </script>
+</body>
+</html>

@@ -501,7 +501,7 @@
             siteWrapper.style.display = 'block';
             document.body.style.overflow = '';
         }, 4000);
-    }, 1000);
+    }, 2500);
     // -----------------------------
 
     // Projects Data (Dummy)
@@ -513,7 +513,9 @@
       { id: 'storageviewer', title: 'Storage Viewer', url: 'https://github.com/aligaliptugcu/aligaliphub/releases/download/v1.0/StorageViewer.zip', isDownload: true },
       { id: 'turnit', title: 'TurnIt', url: 'https://github.com/aligaliptugcu/aligaliphub/releases/download/v1.0/TurnIt.zip', isDownload: true },
       { id: 'retroclock', title: 'Retro Clock', url: '/retro-clock', isDownload: true },
-      { id: '3darm', title: '3Darm', url: '/3darm', isDownload: true }
+            { id: '3darm', title: '3Darm', url: '/3darm', isDownload: true },
+      { id: 'patpatizator', title: 'PatPatizator', url: 'https://github.com/aligaliptugcu/aligaliphub/releases/download/v1.0/PatPatizator.zip', isDownload: true },
+      { id: 'glatris', title: 'GLatris', url: '/glatris.html', isDownload: false }
     ];
     try {
       const cp = JSON.parse(localStorage.getItem('custom_projects') || '[]');
@@ -567,6 +569,8 @@
 
       localStorage.setItem('lang', lang);
       document.getElementById('language-select').value = lang;
+      const iframe = document.getElementById('app-iframe');
+      if(iframe document.getElementById('language-select').value = lang;document.getElementById('language-select').value = lang; iframe.contentWindow) iframe.contentWindow.postMessage({type: 'LANG_CHANGE', lang: lang}, '*');
     }
     
     function getLocalizedUrl(url) {
