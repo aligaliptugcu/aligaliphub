@@ -348,7 +348,10 @@
   <div id="site-wrapper" style="display: none;">
 
 
-  <div class="logo" id="site-logo" style="font-family: 'Black Ops One', cursive; font-size: 30px; line-height: 50px; text-shadow: 2px 2px 0px #aaa; position: relative;">AGHub</div>
+    <div class="logo" id="site-logo" style="font-family: 'Black Ops One', cursive; font-size: 30px; line-height: 50px; text-shadow: 2px 2px 0px #aaa; position: relative; display: flex; align-items: center; gap: 10px;">
+    AGHub
+    <img src="/assets/aligaliphub-icon.png" alt="Icon" style="width: 40px; height: 40px;">
+  </div>
   
   <div class="top-right-controls">
 
@@ -834,32 +837,38 @@
         if (discId) dropHandler({ dataTransfer: { getData: () => discId } });
       };
       
-      // Mobile Drag Delay Setup
-      w.draggable = false; 
-      let dragTimeout;
-      w.addEventListener('touchstart', function(e) {
-         if (w.getAttribute('data-drag-ready') !== 'true') {
-             dragTimeout = setTimeout(() => {
-                 w.draggable = true;
-                 w.setAttribute('data-drag-ready', 'true');
-                 if(navigator.vibrate) navigator.vibrate(30);
-             }, 400); // 400ms hold to drag
-         }
-      }, {passive: true});
+            // Mobile Drag Delay Setup
+      const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
       
-      w.addEventListener('touchend', function(e) {
-         clearTimeout(dragTimeout);
-         setTimeout(() => {
-             w.draggable = false;
-             w.removeAttribute('data-drag-ready');
-         }, 100);
-      }, {passive: true});
-      
-      w.addEventListener('touchmove', function(e) {
-         if (w.getAttribute('data-drag-ready') !== 'true') {
+      if (isTouchDevice) {
+          w.draggable = false; 
+          let dragTimeout;
+          w.addEventListener('touchstart', function(e) {
+             if (w.getAttribute('data-drag-ready') !== 'true') {
+                 dragTimeout = setTimeout(() => {
+                     w.draggable = true;
+                     w.setAttribute('data-drag-ready', 'true');
+                     if(navigator.vibrate) navigator.vibrate(30);
+                 }, 400); // 400ms hold to drag
+             }
+          }, {passive: true});
+          
+          w.addEventListener('touchend', function(e) {
              clearTimeout(dragTimeout);
-         }
-      }, {passive: true});
+             setTimeout(() => {
+                 w.draggable = false;
+                 w.removeAttribute('data-drag-ready');
+             }, 100);
+          }, {passive: true});
+          
+          w.addEventListener('touchmove', function(e) {
+             if (w.getAttribute('data-drag-ready') !== 'true') {
+                 clearTimeout(dragTimeout);
+             }
+          }, {passive: true});
+      } else {
+          w.draggable = true;
+      }
     });
   </script>
   </div>
