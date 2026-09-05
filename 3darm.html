@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3D Robot Kol - Gerçekçi Fizik (Cannon.js)</title>
+  
+  <!-- MediaPipe Kütüphaneleri -->
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils@0.3.1640029074/camera_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils@0.6.1629159505/control_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils@0.3.1620248257/drawing_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1646424915/hands.js" crossorigin="anonymous"></script>
+
+  <style>
+    body { margin: 0; overflow: hidden; background-color: #0d0f14; font-family: 'Segoe UI', sans-serif; user-select: none; }
+    
+    #debug-hud { position: absolute; top: 15px; left: 15px; background: rgba(12, 15, 22, 0.94); border: 1px solid #00f0ff; padding: 16px 20px; border-radius: 10px; color: #00f0ff; font-family: 'Courier New', monospace; font-size: 12px; line-height: 1.6; box-shadow: 0 0 25px rgba(0, 240, 255, 0.25); pointer-events: none; display: none; min-width: 310px; backdrop-filter: blur(5px); z-index: 100; }
+    #debug-hud h3 { margin: 0 0 10px 0; font-size: 14px; color: #ffffff; border-bottom: 1px solid rgba(0, 240, 255, 0.3); padding-bottom: 6px; display: flex; justify-content: space-between; align-items: center; }
+    .status-badge { padding: 3px 8px; border-radius: 4px; font-weight: bold; font-size: 11px; letter-spacing: 0.5px; }
+    .status-held { background: #00ff66; color: #000; }
+    .status-free { background: #00d2ff; color: #000; }
+
+    #cam-container { position: absolute; bottom: 15px; right: 15px; width: 240px; height: 180px; border: 2px solid #00f0ff; border-radius: 10px; overflow: hidden; display: none; box-shadow: 0 0 25px rgba(0, 240, 255, 0.25); z-index: 100; background: #000; }
+    #input_video, #output_canvas { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
+
+    /* KONTROL PANELİ */
+    #settings-panel { position: absolute; top: 60px; right: 15px; width: 290px; background: rgba(12, 15, 22, 0.94); border: 1px solid #ffaa00; padding: 18px 20px; border-radius: 10px; color: #ffaa00; font-family: 'Courier New', monospace; font-size: 13px; line-height: 1.8; box-shadow: 0 0 30px rgba(255, 170, 0, 0.25); display: none; backdrop-filter: blur(5px); z-index: 200; }
+    #settings-panel h3 { margin: 0 0 15px 0; color: #ffffff; border-bottom: 1px solid rgba(255, 170, 0, 0.3); padding-bottom: 6px; font-size: 14px; }
+    .setting-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .setting-row label { cursor: pointer; user-select: none; }
+    .setting-row input[type="checkbox"] { width: 18px; height: 18px; accent-color: #ffaa00; cursor: pointer; }
+    .setting-row select { background:#1a202c; color:#ffaa00; border:1px solid #ffaa00; font-family:inherit; padding:3px; outline:none; border-radius:3px; }
+    
+    .panel-hint { position: absolute; top: 15px; right: 15px; color: #ffaa00; font-size: 12px; font-weight: bold; font-family: monospace; background: rgba(0,0,0,0.6); padding: 6px 12px; border: 1px solid #ffaa00; border-radius: 5px; z-index: 50; cursor: pointer; display: none; }
+    .panel-hint:hover { background: rgba(255,170,0,0.2); }
+  </style>
+</head>
+<body>
+
+<div class="panel-hint" id="hint-btn">KONTROL PANELİ İÇİN [P] BAZINIZ</div>
+
+<div id="settings-panel">
+  <h3>APERTURE KONTROL PANELİ</h3>
+  <div class="setting-row">
+    <label for="sel-graphics">Görsel Kalite Motoru</label>
+    <select id="sel-graphics">
+      <option value="low">Tasarruf</option>
+      <option value="med">Normal</option>
+      <option value="high" selected>Yüksek</option>
+    </select>
+  </div>
+  <hr style="border: 0; border-top: 1px dashed rgba(255,170,0,0.3); margin: 15px 0;">
+  <div class="setting-row">
+    <label for="chk-sensor">Biyometrik El Sensörü</label>
+    <input type="checkbox" id="chk-sensor">
+  </div>
+  <div class="setting-row">
+    <label for="chk-cam-view">Kamera İskelet Önizlemesi</label>
+    <input type="checkbox" id="chk-cam-view">
+  </div>
+  <div class="setting-row">
+    <label for="chk-grip-mode">Merkezi Kavrama (Mıknatıs)</label>
+    <input type="checkbox" id="chk-grip-mode" checked>
+  </div>
+  <div class="setting-row">
+    <label for="chk-glitch">Yerçekimi Anomalisi (Glitch)</label>
+    <input type="checkbox" id="chk-glitch">
+  </div>
+  <hr style="border: 0; border-top: 1px dashed rgba(255,170,0,0.3); margin: 15px 0;">
+  <div style="font-size: 11px; text-align: center; color: rgba(255,170,0,0.7); font-weight: bold;">
+    [A] KÜP SENTEZLE &nbsp;&nbsp;|&nbsp;&nbsp; [R] KÜP YOK ET
+  </div>
+</div>
+
+<div id="cam-container">
+    <video id="input_video" autoplay playsinline></video>
+    <canvas id="output_canvas" style="position:absolute; top:0; left:0; pointer-events:none;"></canvas>
+    <div style="position:absolute; top:5px; left:5px; background:rgba(0,0,0,0.6); color:#00ff66; font-size:10px; padding:2px 6px; border-radius:4px; font-family:monospace;">KİNESTETİK SENSÖR</div>
+</div>
+
+<div id="debug-hud">
+  <h3><span>HATA AYIKLAMA (DEBUG)</span><span id="hud-status-badge" class="status-badge status-free">SERBEST</span></h3>
+  <div><b>Sistem Durumu:</b> <span id="hud-mode" style="color:#00ff66;">DEBUG AKTİF (D)</span></div>
+  <div><b>El Sensörü:</b> <span id="hud-hand" style="color:#ff5555;">KAPALI</span></div>
+  <div><b>Yerçekimi Alanı:</b> <span id="hud-glitch-mode" style="color:#00ff66;">NORMAL (1G)</span></div>
+  <div><b>Test Küpleri:</b> <span id="hud-cube-count" style="color:#00d2ff;">1</span></div>
+  <div><b>Tutucu Modülü:</b> <span id="hud-grip">SERBEST</span> (<span id="hud-grip-pct">0%</span>)</div>
+  <hr style="border: 0; border-top: 1px dashed rgba(255,255,255,0.15); margin: 8px 0;">
+  <div><b>Cannon.js Fizik Motoru:</b> <span style="color:#00ff66;">AKTİF V0.20</span></div>
+  <div><b>Aktif Fizik Kısıtı (Constraint):</b> <span id="hud-constraint">YOK</span></div>
+</div>
+
+<script type="module">
+
+  const lang = localStorage.getItem('lang') || 'tr';
+  const i18n = {
+    tr: {
+      title: "3D Robot Kol - Gerçekçi Fizik (Cannon.js)",
+      hint: "KONTROL PANELİ İÇİN [P] BAZINIZ",
+      panel_title: "APERTURE KONTROL PANELİ",
+      lbl_graphics: "Görsel Kalite Motoru",
+      opt_low: "Tasarruf", opt_med: "Normal", opt_high: "Yüksek",
+      lbl_sensor: "Biyometrik El Sensörü",
+      lbl_cam: "Kamera İskelet Önizlemesi",
+      lbl_grip: "Merkezi Kavrama (Mıknatıs)",
+      lbl_glitch: "Yerçekimi Anomalisi (Glitch)",
+      hints: "[A] KÜP SENTEZLE &nbsp;&nbsp;|&nbsp;&nbsp; [R] KÜP YOK ET",
+      sensor_lbl: "KİNESTETİK SENSÖR",
+      debug_title: "HATA AYIKLAMA (DEBUG)",
+      sys_status: "Sistem Durumu:",
+      hand_sensor: "El Sensörü:",
+      gravity: "Yerçekimi Alanı:",
+      test_cubes: "Test Küpleri:",
+      grip_mod: "Tutucu Modülü:",
+      phys_engine: "Cannon.js Fizik Motoru:",
+      phys_constraint: "Aktif Fizik Kısıtı (Constraint):",
+      debug_active: "DEBUG AKTİF (D)",
+      active: "AKTİF V0.20",
+      off: "KAPALI", on: "AÇIK",
+      norm_g: "NORMAL (1G)", ceil_g: "TAVAN YERÇEKİMİ AKTİF!",
+      free: "SERBEST", locked: "KİLİTLİ", none: t.none
+    },
+    en: {
+      title: "3D Robotic Arm - Realistic Physics",
+      hint: "PRESS [P] FOR CONTROL PANEL",
+      panel_title: "APERTURE CONTROL PANEL",
+      lbl_graphics: "Visual Quality Engine",
+      opt_low: "Economy", opt_med: "Normal", opt_high: "High",
+      lbl_sensor: "Biometric Hand Sensor",
+      lbl_cam: "Camera Skeleton Preview",
+      lbl_grip: "Central Grip (Magnet)",
+      lbl_glitch: "Gravity Anomaly (Glitch)",
+      hints: "[A] SYNTHESIZE CUBE &nbsp;&nbsp;|&nbsp;&nbsp; [R] DESTROY CUBE",
+      sensor_lbl: "KINESTHETIC SENSOR",
+      debug_title: "DEBUGGING",
+      sys_status: "System Status:",
+      hand_sensor: "Hand Sensor:",
+      gravity: "Gravity Field:",
+      test_cubes: "Test Cubes:",
+      grip_mod: "Gripper Module:",
+      phys_engine: "Cannon.js Physics Engine:",
+      phys_constraint: "Active Physics Constraint:",
+      debug_active: "DEBUG ACTIVE (D)",
+      active: "ACTIVE V0.20",
+      off: "OFF", on: "ON",
+      norm_g: "NORMAL (1G)", ceil_g: "CEILING GRAVITY ACTIVE!",
+      free: "FREE", locked: "LOCKED", none: "NONE"
+    }
+  };
+  const t = i18n[lang] || i18n['en'];
+  document.title = t.title;
+  window.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('hint-btn').innerText = t.hint;
+    document.querySelector('#settings-panel h3').innerText = t.panel_title;
+    document.querySelector('label[for="sel-graphics"]').innerText = t.lbl_graphics;
+    const opts = document.getElementById('sel-graphics').options;
+    opts[0].innerText = t.opt_low; opts[1].innerText = t.opt_med; opts[2].innerText = t.opt_high;
+    document.querySelector('label[for="chk-sensor"]').innerText = t.lbl_sensor;
+    document.querySelector('label[for="chk-cam-view"]').innerText = t.lbl_cam;
+    document.querySelector('label[for="chk-grip-mode"]').innerText = t.lbl_grip;
+    document.querySelector('label[for="chk-glitch"]').innerText = t.lbl_glitch;
+    document.querySelector('#settings-panel div:last-child').innerHTML = t.hints;
+    document.querySelector('#cam-container div').innerText = t.sensor_lbl;
+    document.querySelector('#debug-hud h3 span:first-child').innerText = t.debug_title;
+    
+    const ddivs = document.querySelectorAll('#debug-hud div b');
+    if(ddivs.length >= 7) {
+      ddivs[0].innerText = t.sys_status;
+      ddivs[1].innerText = t.hand_sensor;
+      ddivs[2].innerText = t.gravity;
+      ddivs[3].innerText = t.test_cubes;
+      ddivs[4].innerText = t.grip_mod;
+      ddivs[5].innerText = t.phys_engine;
+      ddivs[6].innerText = t.phys_constraint;
+    }
+    document.getElementById('hud-mode').innerText = t.debug_active;
+    document.getElementById('hud-hand').innerText = t.off;
+    document.getElementById('hud-glitch-mode').innerText = t.norm_g;
+    document.getElementById('hud-status-badge').innerText = t.free;
+    document.getElementById('hud-grip').innerText = t.free;
+    document.getElementById('hud-constraint').innerText = t.none;
+    document.querySelector('#debug-hud div:nth-child(9) span').innerText = t.active;
+  });
+
+  import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
+  import * as CANNON from 'https://cdn.jsdelivr.net/npm/cannon-es@0.20.0/dist/cannon-es.js/+esm';
+
+  let isPanelOpen = false;
+  let kinestheticEnabled = false;
+  let showCamera = false;
+  let glitchEnabled = false;
+  let magnetGrip = true;
+
+  const panelDiv = document.getElementById('settings-panel');
+  const chkSensor = document.getElementById('chk-sensor');
+  const chkCamView = document.getElementById('chk-cam-view');
+  const chkGlitch = document.getElementById('chk-glitch');
+  const chkGripMode = document.getElementById('chk-grip-mode');
+  const selGraphics = document.getElementById('sel-graphics');
+
+  // --- CANNON.JS FİZİK DÜNYASI ---
+  const world = new CANNON.World({ gravity: new CANNON.Vec3(0, -35, 0) });
+  world.broadphase = new CANNON.SAPBroadphase(world);
+  world.solver.iterations = 25; // Daha sıkı ve sarsılmaz tutuş için
+
+  const physMat = new CANNON.Material();
+  const physContactMat = new CANNON.ContactMaterial(physMat, physMat, { friction: 1.5, restitution: 0.0 });
+  world.addContactMaterial(physContactMat);
+
+  const groundBody = new CANNON.Body({ type: CANNON.Body.STATIC, shape: new CANNON.Plane(), material: physMat });
+  groundBody.quaternion.setFromEuler(-Math.PI / 2, 0, 0);
+  world.addBody(groundBody);
+
+  const ceilingBody = new CANNON.Body({ type: CANNON.Body.STATIC, shape: new CANNON.Plane(), material: physMat });
+  ceilingBody.quaternion.setFromEuler(Math.PI / 2, 0, 0);
+  ceilingBody.position.set(0, 35, 0);
+  world.addBody(ceilingBody);
+
+  // --- THREE.JS GÖRSEL SAHNE ---
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x0d0f14);
+  const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 2000);
+  camera.position.set(0, 18, 30);
+  camera.lookAt(0, 6, 0);
+
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.setPixelRatio(window.devicePixelRatio || 1); // Varsayılan: Yüksek
+  document.body.appendChild(renderer.domElement);
+
+  scene.add(new THREE.AmbientLight(0xffffff, 1.5));
+  const mainLight = new THREE.DirectionalLight(0xffffff, 2.5);
+  mainLight.position.set(15, 35, 20);
+  mainLight.castShadow = true; 
+  mainLight.shadow.mapSize.width = 2048; 
+  mainLight.shadow.mapSize.height = 2048;
+  scene.add(mainLight);
+  const sideLight = new THREE.DirectionalLight(0x00d2ff, 1.2); sideLight.position.set(-20, 15, -10); scene.add(sideLight);
+
+  scene.add(new THREE.GridHelper(60, 60, 0x00d2ff, 0x222a38).translateY(0.01));
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(80, 80), new THREE.MeshStandardMaterial({ color: 0x10131c, roughness: 0.7 }));
+  floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true;
+  scene.add(floor);
+
+  const platformRadius = 3.2; const platformHeight = 1.2;
+  const platShape = new CANNON.Box(new CANNON.Vec3(platformRadius, platformHeight / 2, platformRadius));
+
+  const createPlatform = (x, z, colorHex) => {
+    const group = new THREE.Group(); group.position.set(x, 0, z);
+    const mesh = new THREE.Mesh(new THREE.CylinderGeometry(platformRadius, platformRadius + 0.3, platformHeight, 32), new THREE.MeshStandardMaterial({ color: colorHex, roughness: 0.3 }));
+    mesh.position.y = platformHeight / 2; mesh.receiveShadow = true; mesh.castShadow = true;
+    group.add(mesh); scene.add(group);
+    
+    const body = new CANNON.Body({ type: CANNON.Body.STATIC, material: physMat });
+    body.addShape(platShape);
+    body.position.set(x, platformHeight / 2, z);
+    world.addBody(body);
+  };
+  createPlatform(7, 3, 0x00b4d8); // Sağ
+  createPlatform(-7, 3, 0x40e0d0); // Sol
+
+  const matBase = new THREE.MeshStandardMaterial({ color: 0x1f2430, roughness: 0.4 });
+  const matBody = new THREE.MeshStandardMaterial({ color: 0xff8c00, roughness: 0.3, metalness: 0.2 });
+  const matJoint = new THREE.MeshStandardMaterial({ color: 0xd9e2ec, roughness: 0.2, metalness: 0.6 });
+  const matGripper = new THREE.MeshStandardMaterial({ color: 0x3b4252, roughness: 0.3 });
+
+  const robotBase = new THREE.Group(); scene.add(robotBase);
+  const basePlate = new THREE.Mesh(new THREE.CylinderGeometry(3.5, 4, 0.8, 32), matBase); basePlate.position.y = 0.4; basePlate.castShadow = true; robotBase.add(basePlate);
+  const turretGroup = new THREE.Group(); turretGroup.position.y = 0.8; robotBase.add(turretGroup);
+  const turretBlock = new THREE.Mesh(new THREE.BoxGeometry(2.8, 2.4, 2.8), matBody); turretBlock.position.y = 1.2; turretBlock.castShadow = true; turretGroup.add(turretBlock);
+  const j1Mesh = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 2.4, 32), matJoint); j1Mesh.rotation.z = Math.PI / 2; j1Mesh.position.set(0, 2.4, 0); turretGroup.add(j1Mesh);
+
+  const lowerArmGroup = new THREE.Group(); lowerArmGroup.position.set(0, 2.4, 0); turretGroup.add(lowerArmGroup);
+  const L1 = 7.0; const L2 = 7.0;
+  const lowerArmMesh = new THREE.Mesh(new THREE.BoxGeometry(1.2, L1, 1.4), matBody); lowerArmMesh.position.set(0, L1 / 2, 0); lowerArmMesh.castShadow = true; lowerArmGroup.add(lowerArmMesh);
+  
+  const upperArmGroup = new THREE.Group(); upperArmGroup.position.set(0, L1, 0); lowerArmGroup.add(upperArmGroup);
+  const j2Mesh = new THREE.Mesh(new THREE.SphereGeometry(1.1, 32, 16), matJoint); upperArmGroup.add(j2Mesh);
+  const upperArmMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.6, 0.8, 4.5, 16), matBody); upperArmMesh.position.y = 2.25; upperArmMesh.castShadow = true; upperArmGroup.add(upperArmMesh);
+
+  const handGroup = new THREE.Group(); handGroup.position.y = 4.5; upperArmGroup.add(handGroup);
+  const gripperBase = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.5, 1.4), matBase); gripperBase.position.y = 0.25; handGroup.add(gripperBase);
+  const createFinger = (isLeft) => { const group = new THREE.Group(); group.position.set((isLeft ? -1 : 1) * 0.8, 0.5, 0); const block = new THREE.Mesh(new THREE.BoxGeometry(0.3, 1.8, 0.4), matGripper); block.position.y = 0.9; block.castShadow = true; group.add(block); return group; };
+  const fingerL = createFinger(true); const fingerR = createFinger(false); handGroup.add(fingerL); handGroup.add(fingerR);
+
+  const tipTarget = new THREE.Object3D(); tipTarget.position.set(0, 2.5, 0); handGroup.add(tipTarget);
+  const pointerMat = new THREE.MeshBasicMaterial({ color: 0x00f0ff, wireframe: true });
+  const mousePointer3D = new THREE.Mesh(new THREE.SphereGeometry(0.4, 16, 16), pointerMat); mousePointer3D.visible = false; scene.add(mousePointer3D);
+
+  const gripperBody = new CANNON.Body({ type: CANNON.Body.KINEMATIC });
+  world.addBody(gripperBody);
+
+  let debugMode = false;
+  const TARGET_SIZE = 2.4;
+  
+  const cubes = [];
+  let heldCube = null;
+  let activeConstraint = null;
+  const cubeColors = [0x14213d, 0xfca311, 0x2a9d8f, 0xd90429];
+
+  function addNewCube() {
+      const half = TARGET_SIZE / 2;
+      const cubeShape = new CANNON.Box(new CANNON.Vec3(half, half, half));
+      
+      const cubeBody = new CANNON.Body({
+          mass: 8,
+          shape: cubeShape,
+          material: physMat,
+          linearDamping: 0.6,
+          angularDamping: 0.85
+      });
+
+      let maxY = platformHeight + half;
+      cubes.forEach(c => {
+         if (Math.hypot(c.body.position.x - (-7), c.body.position.z - 3) < TARGET_SIZE) {
+            if (c.body.position.y + TARGET_SIZE > maxY) maxY = c.body.position.y + TARGET_SIZE + 0.1;
+         }
+      });
+      
+      cubeBody.position.set(-7, maxY + 0.05, 3);
+      world.addBody(cubeBody);
+
+      const geo = new THREE.BoxGeometry(TARGET_SIZE, TARGET_SIZE, TARGET_SIZE);
+      const mat = new THREE.MeshStandardMaterial({ color: cubeColors[Math.floor(Math.random() * cubeColors.length)], roughness: 0.2 });
+      const mesh = new THREE.Mesh(geo, mat); mesh.castShadow = true; mesh.receiveShadow = true;
+      const objGroup = new THREE.Group(); objGroup.add(mesh); scene.add(objGroup);
+
+      const hitboxMesh = new THREE.Mesh(new THREE.BoxGeometry(TARGET_SIZE, TARGET_SIZE, TARGET_SIZE), new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: true, transparent: true, opacity: 0.8 }));
+      hitboxMesh.visible = debugMode; objGroup.add(hitboxMesh);
+
+      cubes.push({ object: objGroup, hitbox: hitboxMesh, body: cubeBody });
+  }
+
+  function removeRandomCube() {
+      if (cubes.length === 0) return;
+      const index = Math.floor(Math.random() * cubes.length);
+      const c = cubes[index];
+      if (heldCube === c) {
+          world.removeConstraint(activeConstraint);
+          activeConstraint = null; heldCube = null;
+      }
+      world.removeBody(c.body); scene.remove(c.object); cubes.splice(index, 1);
+  }
+
+  addNewCube();
+
+  const clock = new THREE.Clock();
+  const raycaster = new THREE.Raycaster();
+  const mouse = new THREE.Vector2(); const targetMouse = new THREE.Vector2();
+  const ikPlane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
+  const target3D = new THREE.Vector3(-5, 6, 5); 
+  let isGripping = false; let gripProgress = 0; let isHandTracking = false;
+
+  function updateTargetPos() {
+      raycaster.setFromCamera(mouse, camera);
+      const camDir = camera.getWorldDirection(new THREE.Vector3()).negate();
+      ikPlane.setFromNormalAndCoplanarPoint(camDir, new THREE.Vector3(0, 4, 2));
+      const intersectPoint = new THREE.Vector3();
+      if (raycaster.ray.intersectPlane(ikPlane, intersectPoint)) {
+        target3D.copy(intersectPoint);
+        mousePointer3D.position.copy(target3D);
+      }
+  }
+
+  function triggerSqueeze(active) {
+    if (active) {
+      if (!isGripping) {
+        isGripping = true;
+        if (!heldCube && !activeConstraint) {
+            let closest = null; let minDist = TARGET_SIZE * 1.5;
+            const tipPos = new THREE.Vector3(); tipTarget.getWorldPosition(tipPos);
+            cubes.forEach(c => {
+                const dist = tipPos.distanceTo(c.object.position);
+                if (dist < minDist) { minDist = dist; closest = c; }
+            });
+            
+            if (closest) {
+                heldCube = closest;
+                
+                if (magnetGrip) {
+                    heldCube.body.velocity.set(0, 0, 0);
+                    heldCube.body.angularVelocity.set(0, 0, 0);
+                    heldCube.body.position.copy(gripperBody.position);
+                    heldCube.body.quaternion.copy(gripperBody.quaternion);
+                }
+
+                activeConstraint = new CANNON.LockConstraint(gripperBody, heldCube.body);
+                world.addConstraint(activeConstraint);
+            }
+        }
+      }
+    } else {
+      if (isGripping) {
+        isGripping = false;
+        if (heldCube && activeConstraint) {
+            world.removeConstraint(activeConstraint);
+            activeConstraint = null; heldCube = null;
+        }
+      }
+    }
+  }
+
+  window.addEventListener('mousemove', (e) => {
+    if (isHandTracking) return;
+    targetMouse.x = (e.clientX / window.innerWidth) * 2 - 1; targetMouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+  });
+  window.addEventListener('mousedown', (e) => { if (e.button === 0 && !isHandTracking) triggerSqueeze(true); });
+  window.addEventListener('mouseup', (e) => { if (e.button === 0 && !isHandTracking) triggerSqueeze(false); });
+
+  // --- KONTROL PANELİ VE MEDIAPIPE YÖNETİMİ ---
+  const videoElement = document.getElementById('input_video'); const canvasElement = document.getElementById('output_canvas'); const canvasCtx = canvasElement.getContext('2d');
+  const hudHand = document.getElementById('hud-hand'); const hudCamView = document.getElementById('hud-cam-view');
+
+  let mCamera = null; let hands = null;
+
+  function togglePanel() {
+      isPanelOpen = !isPanelOpen; panelDiv.style.display = isPanelOpen ? 'block' : 'none'; document.getElementById('hint-btn').style.display = isPanelOpen ? 'none' : 'block';
+  }
+  document.getElementById('hint-btn').addEventListener('click', togglePanel); togglePanel(); 
+
+  // Grafik Ayarları Yönetimi
+  selGraphics.addEventListener('change', (e) => {
+      const mode = e.target.value;
+      if (mode === 'low') {
+          renderer.shadowMap.enabled = false;
+          renderer.setPixelRatio(0.6); // Pixel yoğunluğunu aşırı düşür (GPU dostu)
+          mainLight.castShadow = false;
+      } else if (mode === 'med') {
+          renderer.shadowMap.enabled = true;
+          renderer.shadowMap.type = THREE.PCFShadowMap;
+          renderer.setPixelRatio(1.0);
+          mainLight.castShadow = true;
+          mainLight.shadow.mapSize.width = 1024;
+          mainLight.shadow.mapSize.height = 1024;
+      } else {
+          renderer.shadowMap.enabled = true;
+          renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+          renderer.setPixelRatio(window.devicePixelRatio || 1);
+          mainLight.castShadow = true;
+          mainLight.shadow.mapSize.width = 2048;
+          mainLight.shadow.mapSize.height = 2048;
+      }
+      mainLight.shadow.map = null; // Eski haritayı sıfırla ki çözünürlük değişsin
+      scene.traverse((child) => { if (child.isMesh) child.material.needsUpdate = true; }); // Şeyderları yenile
+  });
+
+  function syncPanelUI() {
+      chkSensor.checked = kinestheticEnabled; chkCamView.checked = showCamera; chkGlitch.checked = glitchEnabled;
+      chkGripMode.checked = magnetGrip;
+      document.getElementById('hud-glitch-mode').textContent = glitchEnabled ? t.ceil_g : t.norm_g;
+      document.getElementById('hud-glitch-mode').style.color = glitchEnabled ? "#ff0055" : "#00ff66";
+      
+      if (glitchEnabled) world.gravity.set(0, 15, 0); else world.gravity.set(0, -35, 0);
+  }
+
+  function toggleCameraView(forceState) {
+      if (forceState !== undefined) showCamera = forceState; else showCamera = !showCamera;
+      if (showCamera && kinestheticEnabled) document.getElementById('cam-container').style.display = 'block'; else document.getElementById('cam-container').style.display = 'none';
+      syncPanelUI();
+  }
+
+  function toggleKinestheticSensor(forceState) {
+      if (forceState !== undefined) kinestheticEnabled = forceState; else kinestheticEnabled = !kinestheticEnabled;
+      if (kinestheticEnabled) {
+          hudHand.textContent = "BAŞLATILIYOR..."; hudHand.style.color = "#ffea00";
+          if (!hands && typeof window.Hands !== 'undefined') {
+              hands = new window.Hands({locateFile: (f) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1646424915/${f}`});
+              hands.setOptions({maxNumHands: 1, modelComplexity: 1, minDetectionConfidence: 0.6, minTrackingConfidence: 0.6}); hands.onResults(onResults);
+          }
+          if (!mCamera && typeof window.Camera !== 'undefined') { mCamera = new window.Camera(videoElement, { onFrame: async () => { if (kinestheticEnabled) await hands.send({image: videoElement}); }, width: 320, height: 240 }); }
+          if (mCamera) {
+              mCamera.start().then(() => { if (showCamera) document.getElementById('cam-container').style.display = 'block'; hudHand.textContent = "BEKLENİYOR (EL YOK)"; })
+              .catch(err => { hudHand.textContent = "KAMERA REDDEDİLDİ"; hudHand.style.color = "#ff0055"; kinestheticEnabled = false; syncPanelUI(); });
+          }
+      } else {
+          hudHand.textContent = "KAPALI"; hudHand.style.color = "#ff5555"; isHandTracking = false; document.getElementById('cam-container').style.display = 'none';
+          if (mCamera) mCamera.stop();
+      }
+      syncPanelUI();
+  }
+
+  chkSensor.addEventListener('change', (e) => toggleKinestheticSensor(e.target.checked));
+  chkCamView.addEventListener('change', (e) => toggleCameraView(e.target.checked));
+  chkGlitch.addEventListener('change', (e) => { glitchEnabled = e.target.checked; syncPanelUI(); });
+  chkGripMode.addEventListener('change', (e) => { magnetGrip = e.target.checked; syncPanelUI(); });
+  
+  function onResults(results) {
+    if (!kinestheticEnabled) return;
+    canvasElement.width = videoElement.videoWidth || 320; canvasElement.height = videoElement.videoHeight || 240;
+    canvasCtx.save(); canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+    if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+      isHandTracking = true; hudHand.textContent = "AKTİF (EL ALGILANDI)"; hudHand.style.color = "#00ff66";
+      const landmarks = results.multiHandLandmarks[0];
+      window.drawConnectors(canvasCtx, landmarks, window.HAND_CONNECTIONS, {color: '#00f0ff', lineWidth: 2}); window.drawLandmarks(canvasCtx, landmarks, {color: '#ffea00', lineWidth: 1, radius: 2});
+      targetMouse.x = -(landmarks[8].x * 2 - 1); targetMouse.y = -(landmarks[8].y * 2 - 1);
+      const dx = landmarks[8].x - landmarks[4].x; const dy = landmarks[8].y - landmarks[4].y;
+      const pinchDist = Math.sqrt(dx*dx + dy*dy);
+      if (!isGripping && pinchDist < 0.05) triggerSqueeze(true); else if (isGripping && pinchDist > 0.09) triggerSqueeze(false);
+    } else {
+      isHandTracking = false; hudHand.textContent = "BEKLENİYOR (EL YOK)"; hudHand.style.color = "#ffea00";
+    }
+    canvasCtx.restore();
+  }
+
+  window.addEventListener('keydown', (e) => {
+    const key = e.key.toLowerCase();
+    if (key === 'p') togglePanel();
+    if (key === 'd') { debugMode = !debugMode; document.getElementById('debug-hud').style.display = debugMode ? 'block' : 'none'; cubes.forEach(c => c.hitbox.visible = debugMode); if (mousePointer3D) mousePointer3D.visible = debugMode; }
+    if (key === 'a') addNewCube(); if (key === 'r') removeRandomCube(); if (key === 'w') toggleKinestheticSensor();
+  });
+
+  window.addEventListener('resize', () => { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); });
+
+  function solveIK(deltaTime) {
+    const baseWorldPos = new THREE.Vector3(0, 3.2, 0);
+    const dx = target3D.x - baseWorldPos.x; const dy = target3D.y - baseWorldPos.y; const dz = target3D.z - baseWorldPos.z;
+    const turretAngle = Math.atan2(dx, dz);
+    let angleDiff = turretAngle - turretGroup.rotation.y; angleDiff = Math.atan2(Math.sin(angleDiff), Math.cos(angleDiff));
+    turretGroup.rotation.y += angleDiff * 0.14;
+    const r = Math.sqrt(dx * dx + dz * dz); let D = Math.sqrt(r * r + dy * dy);
+    const maxReach = L1 + L2 - 0.05; if (D > maxReach) D = maxReach; if (D < 0.8) D = 0.8;
+    const alpha = Math.acos(Math.max(-1, Math.min(1, (L1 * L1 + D * D - L2 * L2) / (2 * L1 * D)))); const beta = Math.acos(Math.max(-1, Math.min(1, (L1 * L1 + L2 * L2 - D * D) / (2 * L1 * L2))));
+    lowerArmGroup.rotation.x += ((Math.atan2(r, dy) - alpha) - lowerArmGroup.rotation.x) * 0.14;
+    upperArmGroup.rotation.x += ((Math.PI - beta) - upperArmGroup.rotation.x) * 0.14;
+  }
+
+  const tipWorldPos = new THREE.Vector3();
+
+  function animate() {
+    requestAnimationFrame(animate);
+    const deltaTime = Math.min(clock.getDelta(), 0.05);
+
+    mouse.lerp(targetMouse, 0.15);
+    updateTargetPos();
+    solveIK(deltaTime);
+
+    gripProgress += ((isGripping ? 1 : 0) - gripProgress) * 0.2;
+    fingerL.position.x = -0.8 + gripProgress * 0.42; fingerR.position.x = 0.8 - gripProgress * 0.42;
+    tipTarget.getWorldPosition(tipWorldPos);
+
+    world.step(1/60, deltaTime, 5);
+    gripperBody.position.copy(tipWorldPos);
+    
+    cubes.forEach(cube => {
+      cube.object.position.copy(cube.body.position);
+      cube.object.quaternion.copy(cube.body.quaternion);
+
+      if (debugMode) {
+          const dist = tipWorldPos.distanceTo(cube.object.position);
+          cube.hitbox.material.color.setHex((dist < TARGET_SIZE * 1.5) ? 0x00ff00 : 0x00f0ff);
+      }
+    });
+
+    if (debugMode) {
+      document.getElementById('hud-cube-count').textContent = cubes.length;
+      document.getElementById('hud-grip-pct').textContent = Math.round(gripProgress * 100) + '%';
+      
+      const badge = document.getElementById('hud-status-badge');
+      const gripText = document.getElementById('hud-grip');
+      
+      if (activeConstraint) { badge.textContent = t.locked; badge.className = 'status-badge status-held'; document.getElementById('hud-constraint').textContent = "LockConstraint"; }
+      else { badge.textContent = t.free; badge.className = 'status-badge status-free'; document.getElementById('hud-constraint').textContent = t.none; }
+      gripText.textContent = activeConstraint ? 'KAVRANIYOR' : (isGripping ? 'KAPANIYOR' : 'AÇIK');
+      gripText.style.color = activeConstraint ? '#00ff66' : (isGripping ? '#ffea00' : '#ffffff');
+    }
+    renderer.render(scene, camera);
+  }
+
+  animate();
+</script>
+</body>
+</html>

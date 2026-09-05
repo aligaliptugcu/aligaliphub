@@ -13,8 +13,14 @@
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Pixelify+Sans:wght@400..700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+  <!-- Mobile Drag & Drop Support -->
+  <script src="https://bernardo-castilho.github.io/DragDropTouch/DragDropTouch.js"></script>
   
   <style>
+    @font-face {
+      font-family: 'Floppy Disk';
+      src: url('/assets/fonts/FloppyDisk.ttf') format('truetype');
+    }
     body {
       background-color: #ffffff;
       margin: 0;
@@ -33,7 +39,7 @@
 
     .logo {
       position: absolute;
-      top: 20px;
+      top: 30px;
       left: 20px;
       width: 50px;
       height: 50px;
@@ -43,7 +49,7 @@
 
     .top-right-controls {
       position: absolute;
-      top: 20px;
+      top: 10px;
       right: 20px;
       display: flex;
       flex-direction: column;
@@ -81,7 +87,8 @@
     .main-content {
       max-width: 1000px;
       margin: 0 auto;
-      padding-top: 30px; /* Üste daha yakın ama yapışık değil */
+      padding-top: 30px;
+      padding-bottom: 10px;
       text-align: center;
     }
     
@@ -194,11 +201,16 @@
     
     .floppy-title {
       font-family: 'Caveat', cursive;
-      font-size: 18px;
+      font-size: 14px;
       font-weight: bold;
       color: #000;
-      line-height: 1;
+      line-height: 1.1;
       margin-top: 15px;
+      white-space: normal;
+      word-wrap: break-word;
+      max-height: 32px;
+      overflow: hidden;
+      padding: 0 5px;
     }
     
     .floppy-slogan {
@@ -260,18 +272,67 @@
       box-shadow: none;
     }
 
+      /* Mobile Layout - Dynamic Island Style */
+    @media (max-width: 768px) {
+      .top-right-controls {
+        position: fixed;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        right: auto;
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        padding: 10px 20px;
+        border-radius: 0 0 25px 25px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        z-index: 999;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 80%;
+        max-width: 300px;
+      }
+      
+      body.dark-mode .top-right-controls {
+        background: rgba(18, 18, 18, 0.8);
+        box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+      }
+
+      .logo {
+        position: static !important;
+        margin: 20px auto;
+        text-align: center;
+        width: 100% !important;
+      }
+
+      .main-content {
+        padding-top: 150px;
+      }
+
+      .archive-box {
+        flex-direction: column;
+        align-items: center;
+        gap: 25px;
+        padding: 40px 15px;
+      }
+
+      .floppy-wrapper {
+        margin: 0 auto;
+      }
+    }
   </style>
 </head>
 <body>
 
-  <div class="logo" id="site-logo" style="font-family: 'Black Ops One', cursive; font-size: 30px; line-height: 50px; text-shadow: 2px 2px 0px #aaa;">AGHub</div>
+  <div class="logo" id="site-logo" style="font-family: 'Black Ops One', cursive; font-size: 30px; line-height: 50px; text-shadow: 2px 2px 0px #aaa; position: relative;">AGHub</div>
   
   <div class="top-right-controls">
-    <div style="font-family: 'Press Start 2P', monospace; font-size: 10px; color: #888; margin-bottom: 5px;"><span id="t-alpha">Alpha Sürümü</span></div>
+
     
     <div style="display: flex; flex-direction: row; align-items: center; gap: 20px;">
       <!-- Theme Toggle Button -->
-      <button id="theme-toggle" style="background: transparent; border: none; cursor: pointer; color: inherit; transition: transform 0.2s; display: flex; align-items: center; justify-content: center; padding: 0;" onmouseover="this.style.transform='scale(1.1)';" onmouseout="this.style.transform='scale(1)';" onclick="document.getElementById('actual-theme-btn').click();">
+      <button id="theme-toggle" style="background: transparent; border: none; cursor: pointer; color: inherit; transition: transform 0.2s; display: flex; align-items: center; justify-content: center; padding: 0;" onmouseover="this.style.transform='scale(1.1)';" onmouseout="this.style.transform='scale(1)';" >
         <span class="material-symbols-outlined" id="theme-icon" style="font-size: 36px;">light_mode</span>
       </button>
 
@@ -282,16 +343,16 @@
              ondragover="dragOverHandler(event)" 
              ondragleave="dragLeaveHandler(event)"
              onclick="ejectDisc()">
-          <img src="assets/discs/disc-reader.png" id="reader-img" alt="Disc Reader">
+          <img src="/assets/discs/disc-reader.png" id="reader-img" alt="Disc Reader">
         </div>
-        <button id="actual-theme-btn" style="display:none;"></button>
+        
       <div id="broken-text" style="color: red; font-family: 'Press Start 2P', monospace; font-size: 10px; margin-top: 10px; display: none; text-align: center; max-width: 150px; line-height: 1.4; text-shadow: 1px 1px 0px #000;"><span id="t-broken">Eyvah, disk bozuldu, düzeltmek için sayfayı yenileyin</span></div>
       </div>
     </div>
   </div>
 
   <div class="main-content">
-    <h1 style="font-family: 'Black Ops One', cursive; font-size: 4rem; letter-spacing: 2px;">AliGalipHub</h1>
+    <h1 style="font-family: 'Black Ops One', cursive; font-size: 4rem; letter-spacing: 2px;"><span style="font-family: 'Floppy Disk', sans-serif;">A</span>li<span style="font-family: 'Floppy Disk', sans-serif;">G</span>alip<span style="font-family: 'Floppy Disk', sans-serif;">H</span>ub</h1>
     <p class="subtitle" id="t-subtitle">Ali Galip'ten bir sürü proje</p>
     
     <div class="archive-box">
@@ -322,55 +383,22 @@
   </select>
 
 
-  <div id="feedback-section" style="margin-top: 100vh; padding: 80px 20px; text-align: center; border-top: 4px dashed #666; background: rgba(0,0,0,0.05);">
-    <h2 style="font-family: 'Black Ops One', cursive; font-size: 2.5rem;" id="t-fb-title">Geri Bildirim</h2>
-    <p style="margin-bottom: 40px; font-family: 'Pixelify Sans', sans-serif;"><span id="t-fb-desc">Diski 'Üzerine Yaz' sürücüsüne takıp kaydedin, ardından 'Gönder' sürücüsüyle iletin.</span></p>
-    
-    <div style="display: flex; justify-content: center; gap: 40px; align-items: flex-start; flex-wrap: wrap;">
-      
-      <!-- Write Drive -->
-      <div style="display: flex; flex-direction: column; align-items: center;">
-        <h3 style="font-family: 'Press Start 2P', monospace; font-size: 14px;" id="t-write">Üzerine Yaz</h3>
-        <div class="reader-container" id="write-drive" ondrop="writeDrop(event)" ondragover="dragOverHandler(event)" ondragleave="dragLeaveHandler(event)" onclick="ejectWriteDisc()">
-          <img src="assets/discs/disc-reader.png" id="write-reader-img" alt="Write Drive">
-        </div>
-        
-        <!-- Write Form -->
-        <div id="write-form" style="display: none; flex-direction: column; gap: 10px; margin-top: 20px; background: #fff; border: 3px solid #333; padding: 15px; color: #000; width: 250px; text-align: left; box-shadow: 4px 4px 0px #000;">
-          <label style="font-family: 'Press Start 2P', monospace; font-size: 10px;" id="t-cat">Kategori:</label>
-          <select id="fb-category" style="padding: 5px; font-family: sans-serif;">
-            <option>Şikayet</option>
-            <option>Öneri</option>
-            <option>Teşekkür</option>
-            <option>Diğer</option>
-          </select>
-          <label style="font-family: 'Press Start 2P', monospace; font-size: 10px; margin-top: 10px;" id="t-msg">Mesaj:</label>
-          <textarea id="fb-text" rows="4" style="padding: 5px; font-family: sans-serif;" placeholder="Mesajınız..."></textarea>
-          <button onclick="saveFeedback(event)" style="margin-top: 10px; padding: 10px; cursor: pointer; font-family: 'Press Start 2P', monospace; font-size: 10px; background: #d3d3d3; border: 2px solid #000; box-shadow: 2px 2px 0px #000;"><span id="t-save">KAYDET & ÇIKAR</span></button>
-        </div>
+  
+
+
+  <div class="feedback-section" style="margin-top: 20px; margin-bottom: 0;">
+    <div style="display:flex; justify-content:center; gap: 30px;">
+      <div class="floppy-wrapper" draggable="true" id="disc-idk15052007" style="cursor: grab;">
+        <img src="/assets/discs/floppy-disc.png" class="floppy-img" alt="idk15052007 Disc">
+        <div class="floppy-label"><div class="floppy-title" style="font-size: 14px;">idk15052007.exe</div></div>
       </div>
-      
-      <!-- Send Drive -->
-      <div style="display: flex; flex-direction: column; align-items: center;">
-        <h3 style="font-family: 'Press Start 2P', monospace; font-size: 14px;" id="t-send">Gönder</h3>
-        <div class="reader-container" id="send-drive" ondrop="sendDrop(event)" ondragover="dragOverHandler(event)" ondragleave="dragLeaveHandler(event)" onclick="ejectSendDisc()">
-          <img src="assets/discs/disc-reader.png" id="send-reader-img" alt="Send Drive">
-        </div>
-        <div id="send-status" style="display: none; color: #2ecc71; font-family: 'Pixelify Sans', sans-serif; font-size: 18px; font-weight: bold; margin-top: 20px; max-width: 250px; background: #000; padding: 10px; border: 2px solid #2ecc71;"></div>
+      <div class="floppy-wrapper" draggable="true" id="disc-contact" style="cursor: grab;">
+        <img src="/assets/discs/floppy-disc.png" class="floppy-img" alt="Contact Disc">
+        <div class="floppy-label"><div class="floppy-title" style="font-size: 14px;">contact.exe</div></div>
       </div>
-      
-      <!-- Feedback Floppy -->
-      <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding-top: 40px;">
-        <div class="floppy-wrapper" id="feedback-disc" draggable="true" ondragstart="fbDragStart(event)" style="cursor: grab;">
-          <img src="assets/discs/floppy-disc.png" class="floppy-img" id="fb-floppy-img">
-          <div class="floppy-label">
-            <div class="floppy-title" id="fb-disc-title" style="font-size: 14px; color: #e74c3c; margin-top: 25px;">BOS DISK</div>
-          </div>
-        </div>
-      </div>
-      
     </div>
   </div>
+
   
   
   <div id="win98-download" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #c0c0c0; border: 2px solid #000; box-shadow: 2px 2px 0px #000; width: 300px; z-index: 2000; font-family: 'Pixelify Sans', sans-serif;">
@@ -379,6 +407,9 @@
       <span style="background: #c0c0c0; color: #000; border: 1px solid #fff; border-bottom-color: #888; border-right-color: #888; padding: 0 4px; cursor: pointer;" onclick="document.getElementById('win98-download').style.display='none';">X</span>
     </div>
     <div style="padding: 15px;">
+      <div id="download-preview" style="display: none; width: 100%; height: 100px; margin-bottom: 10px; border: 2px inset #fff; border-top-color: #888; border-left-color: #888; overflow: hidden; background: #000;">
+         <iframe id="preview-iframe" style="width: 100%; height: 100%; border: none;" src="about:blank"></iframe>
+      </div>
       <p id="t-download-text" style="margin: 0 0 10px 0; font-size: 14px; color: #000;">Lütfen bekleyin, dosya indiriliyor...</p>
       <div style="border: 2px inset #fff; border-top-color: #888; border-left-color: #888; height: 20px; background: #fff; position: relative;">
         <div id="win98-progress-bar" style="background: #000080; height: 100%; width: 0%;"></div>
@@ -388,32 +419,47 @@
   <!-- App Viewer -->
   <div id="app-viewer">
     <button id="eject-btn" onclick="ejectDisc()"><span id="t-eject">[ DİSKETİ ÇIKAR ]</span></button>
-    <iframe id="app-iframe" src="about:blank"></iframe>
+    <div id="rickroll-trap" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #008080; z-index: 1002; flex-direction: column; align-items: center; justify-content: center; font-family: 'Pixelify Sans', sans-serif;">
+       <div style="background: #c0c0c0; border: 2px solid #fff; border-bottom-color: #000; border-right-color: #000; padding: 2px; text-align: center; max-width: 400px; box-shadow: 2px 2px 0px #000;">
+          <div style="background: #000080; color: #fff; text-align: left; padding: 3px 5px; font-family: 'Press Start 2P', monospace; font-size: 10px; font-weight: bold;">Hata</div>
+          <div style="padding: 20px;">
+            <p style="font-size: 16px; margin: 10px 0 20px 0; color: #000;">Yüklenemedi Lütfen Yeniden Deneyin.</p>
+            <button onclick="triggerRickRoll()" style="background: #c0c0c0; border: 2px outset #fff; border-bottom-color: #888; border-right-color: #888; padding: 5px 20px; font-family: 'Pixelify Sans', sans-serif; font-size: 16px; cursor: pointer; color: #000;">Yeniden Dene</button>
+          </div>
+       </div>
+    </div>
+    <iframe id="app-iframe" src="about:blank" allow="autoplay; fullscreen"></iframe>
+    <video id="app-video" src="/assets/video/rickroll.mp4" style="display: none; width: 100%; height: 100%; object-fit: contain; background: #000;" loop></video>
   </div>
 
   <!-- Audio Elements -->
-  <audio id="disc-audio" src="assets/discs/disc-sound.mp3"></audio>
-  <audio id="fan-audio" src="assets/discs/fan-sound.mp3" loop></audio>
-  <audio id="eject-audio" src="assets/discs/floppy-eject.mp3"></audio>
+  <audio id="disc-audio" src="/assets/discs/disc-sound.mp3"></audio>
+  <audio id="fan-audio" src="/assets/discs/fan-sound.mp3" loop></audio>
+  <audio id="eject-audio" src="/assets/discs/floppy-eject.mp3"></audio>
 
   <script>
     // Projects Data (Dummy)
-    let fbDiscState = 'empty';
-    let fbDiscInWrite = false;
-    let fbDiscInSend = false;
-    const projects = [
+
+    let projects = [
+      { id: 'awebsitespace', title: 'A WebSite Space', url: 'https://www.awebsite.space', isDownload: true },
+      { id: 'haberci', title: 'AGRSS', url: 'https://store.kde.org/p/1234567', isDownload: false },
       { id: 'nottasks', title: 'NotTasks', url: 'https://github.com/aligaliptugcu/NotTasks', isDownload: false },
       { id: 'storageviewer', title: 'Storage Viewer', url: 'https://github.com/aligaliptugcu/simple_storage_viewer', isDownload: false },
       { id: 'turnit', title: 'TurnIt', url: 'https://github.com/aligaliptugcu/TurnIt/releases/download/v1.0/turnit.zip', isDownload: true },
-      { id: 'haberci', title: 'AGRSS Haberci', url: 'https://store.kde.org/p/1234567', isDownload: false }
+      { id: 'retroclock', title: 'Retro Clock', url: '/retro-clock', isDownload: true },
+      { id: '3darm', title: '3Darm', url: '/3darm', isDownload: true }
     ];
+    try {
+      const cp = JSON.parse(localStorage.getItem('custom_projects') || '[]');
+      if(Array.isArray(cp)) projects = projects.concat(cp);
+    } catch(e) {}
 
     const discsContainer = document.getElementById('discs-container');
     const readerImg = document.getElementById('reader-img');
     const readerContainer = document.getElementById('reader-container');
     const appViewer = document.getElementById('app-viewer');
     const appIframe = document.getElementById('app-iframe');
-    const themeToggle = document.getElementById('actual-theme-btn');
+    const themeToggle = document.getElementById('theme-toggle');
     const themeIcon = document.getElementById('theme-icon');
     const discAudio = document.getElementById('disc-audio');
     const fanAudio = document.getElementById('fan-audio');
@@ -422,7 +468,7 @@
     let isBroken = false;
 
     const translations = {
-      en: { subtitle: "A lot of projects from Ali Galip", archive: "PROJECT ARCHIVE", eject: "[ EJECT DISC ]", broken: "Oops, disc is broken, refresh the page", alpha: "Alpha Version", fbtitle: "Feedback", fbdesc: "Insert disc into Write drive, save, then insert to Send drive.", write: "Write", send: "Send", cat: "Category:", msg: "Message:", save: "SAVE & EJECT", dl_title: "Downloading...", dl_text: "Please wait, downloading file...", empty_disc: "EMPTY DISC", full_disc: "FULL DISC", status_sending: "Sending...", status_sent: "Process Complete" },
+      en: { subtitle: "A Floppy Disc collection created by Ali Galip", archive: "PROJECT ARCHIVE", eject: "[ EJECT DISC ]", broken: "Oops, disc is broken, refresh the page", alpha: "Alpha Version", fbtitle: "Feedback", fbdesc: "Insert disc into Write drive, save, then insert to Send drive.", write: "Write", send: "Send", cat: "Category:", msg: "Message:", save: "SAVE & EJECT", dl_title: "Downloading...", dl_text: "Please wait, downloading file...", empty_disc: "EMPTY DISC", full_disc: "FULL DISC", status_sending: "Sending...", status_sent: "Process Complete" },
       tr: { subtitle: "Ali Galip'ten bir sürü proje", archive: "PROJE ARŞİVİ", eject: "[ DİSKETİ ÇIKAR ]", broken: "Eyvah, disk bozuldu, düzeltmek için sayfayı yenileyin", alpha: "Alpha Sürümü", fbtitle: "Geri Bildirim", fbdesc: "Diski 'Üzerine Yaz' sürücüsüne takıp kaydedin, ardından 'Gönder' sürücüsüyle iletin.", write: "Üzerine Yaz", send: "Gönder", cat: "Kategori:", msg: "Mesaj:", save: "KAYDET & ÇIKAR", dl_title: "İndiriliyor...", dl_text: "Lütfen bekleyin, dosya indiriliyor...", empty_disc: "BOS DISK", full_disc: "DOLU DISK", status_sending: "İletiliyor...", status_sent: "İşlem Tamamlandı" },
       zh: { subtitle: "Ali Galip的许多项目", archive: "项目档案", eject: "[ 弹出磁盘 ]", broken: "哎呀，磁盘损坏了，请刷新页面", alpha: "Alpha版本", fbtitle: "反馈", fbdesc: "将磁盘插入写入驱动器，保存，然后插入发送驱动器。", write: "写入", send: "发送", cat: "类别：", msg: "消息：", save: "保存并弹出", dl_title: "下载中...", dl_text: "请稍候，文件正在下载...", empty_disc: "空磁盘", full_disc: "全盘", status_sending: "发送中...", status_sent: "处理完成" },
       hi: { subtitle: "अली गालिप से कई प्रोजेक्ट", archive: "परियोजना संग्रह", eject: "[ डिस्क निकालें ]", broken: "उफ़, डिस्क टूट गई है, पृष्ठ को रीफ्रेश करें", alpha: "अल्फा संस्करण", fbtitle: "प्रतिक्रिया", fbdesc: "लिखें ड्राइव में डिस्क डालें, सहेजें, फिर भेजें ड्राइव में डालें।", write: "लिखें", send: "भेजें", cat: "श्रेणी:", msg: "संदेश:", save: "सहेजें और निकालें", dl_title: "डाउनलोड हो रहा है...", dl_text: "कृपया प्रतीक्षा करें, फ़ाइल डाउनलोड हो रही है...", empty_disc: "खाली डिस्क", full_disc: "पूर्ण डिस्क", status_sending: "भेजा जा रहा है...", status_sent: "प्रक्रिया पूरी हुई" },
@@ -447,38 +493,53 @@
       if(document.getElementById('t-eject')) document.getElementById('t-eject').textContent = t.eject;
       if(document.getElementById('t-broken')) document.getElementById('t-broken').textContent = t.broken;
       if(document.getElementById('t-alpha')) document.getElementById('t-alpha').textContent = t.alpha;
-      if(document.getElementById('t-fb-title')) document.getElementById('t-fb-title').textContent = t.fbtitle;
-      if(document.getElementById('t-fb-desc')) document.getElementById('t-fb-desc').textContent = t.fbdesc;
-      if(document.getElementById('t-write')) document.getElementById('t-write').textContent = t.write;
-      if(document.getElementById('t-send')) document.getElementById('t-send').textContent = t.send;
-      if(document.getElementById('t-cat')) document.getElementById('t-cat').textContent = t.cat;
-      if(document.getElementById('t-msg')) document.getElementById('t-msg').textContent = t.msg;
-      if(document.getElementById('t-save')) document.getElementById('t-save').textContent = t.save;
+
       if(document.getElementById('t-download-title')) document.getElementById('t-download-title').textContent = t.dl_title;
       if(document.getElementById('t-download-text')) document.getElementById('t-download-text').textContent = t.dl_text;
       
-      const fbDisc = document.getElementById('fb-disc-title');
-      if (fbDisc) {
-         if (fbDiscState === 'empty') fbDisc.textContent = t.empty_disc;
-         else fbDisc.textContent = t.full_disc;
-      }
-      
-      const sendStatus = document.getElementById('send-status');
-      if (sendStatus && sendStatus.style.display === 'block') {
-         if (sendStatus.getAttribute('data-state') === 'sending') sendStatus.textContent = t.status_sending;
-         else if (sendStatus.getAttribute('data-state') === 'sent') sendStatus.textContent = t.status_sent;
-      }
+
 
       localStorage.setItem('lang', lang);
       document.getElementById('language-select').value = lang;
     }
     
-document.getElementById('language-select').addEventListener('change', (e) => {
-      updateLanguage(e.target.value);
-    });
+    function getLocalizedUrl(url) {
+      if (url.startsWith('http') || url === 'trap') return url;
+      const lang = localStorage.getItem('lang') || 'tr';
+      return `/${lang}${url.startsWith('/') ? url : '/' + url}`;
+    }
 
-    const savedLang = localStorage.getItem('lang') || 'tr';
-    updateLanguage(savedLang);
+    // Language routing logic
+    const pathSegments = window.location.pathname.split('/').filter(Boolean);
+    let urlLang = null;
+    
+    // Check if the first path segment is a language code
+    if (pathSegments.length > 0 && translations[pathSegments[0]]) {
+        urlLang = pathSegments[0];
+    }
+
+    let activeLang = urlLang || localStorage.getItem('lang') || 'tr';
+    
+    if (window.location.pathname === '/' || window.location.pathname === '') {
+        window.history.replaceState(null, '', '/' + activeLang + '/');
+    } else if (urlLang && urlLang !== localStorage.getItem('lang')) {
+        localStorage.setItem('lang', urlLang);
+    }
+
+    updateLanguage(activeLang);
+
+    document.getElementById('language-select').addEventListener('change', (e) => {
+      const newLang = e.target.value;
+      localStorage.setItem('lang', newLang);
+      
+      const segments = window.location.pathname.split('/').filter(Boolean);
+      if (segments.length > 0 && translations[segments[0]]) {
+          segments[0] = newLang;
+      } else {
+          segments.unshift(newLang);
+      }
+      window.location.href = '/' + segments.join('/');
+    });
     
     // Original JS starts here
     // Load user preferences
@@ -512,13 +573,30 @@ document.getElementById('language-select').addEventListener('change', (e) => {
       });
 
       wrapper.innerHTML = `
-        <img src="assets/discs/floppy-disc.png" class="floppy-img" alt="Floppy Disc">
+        <img src="/assets/discs/floppy-disc.png" class="floppy-img" alt="Floppy Disc">
         <div class="floppy-label">
           <div class="floppy-title">${p.title}</div>
         </div>
       `;
       discsContainer.appendChild(wrapper);
     });
+
+
+    // Contact and Aboutme Disc Drag
+    const contactDisc = document.getElementById('disc-contact');
+    if (contactDisc) {
+      contactDisc.addEventListener('dragstart', (e) => {
+        e.dataTransfer.setData('text/plain', 'contact');
+        e.dataTransfer.effectAllowed = 'move';
+      });
+    }
+    const idkDisc = document.getElementById('disc-idk15052007');
+    if (idkDisc) {
+      idkDisc.addEventListener('dragstart', (e) => {
+        e.dataTransfer.setData('text/plain', 'idk15052007');
+        e.dataTransfer.effectAllowed = 'move';
+      });
+    }
 
     // Drag & Drop Handlers
     function dragOverHandler(e) {
@@ -547,7 +625,12 @@ document.getElementById('language-select').addEventListener('change', (e) => {
       const projectId = e.dataTransfer.getData('text/plain');
       if (!projectId) return;
 
-      const project = projects.find(p => p.id === projectId);
+      let project = projects.find(p => p.id === projectId);
+      if (projectId === 'contact') {
+         project = { id: 'contact', title: 'contact.exe', url: 'https://forms.gle/2yAQQzSyd6Gdju5S6', isDownload: true };
+      } else if (projectId === 'idk15052007') {
+         project = { id: 'idk15052007', title: 'idk15052007.exe', url: 'trap', isDownload: true };
+      }
       if (!project) return;
 
       // Insert Disc
@@ -557,7 +640,7 @@ document.getElementById('language-select').addEventListener('change', (e) => {
       document.getElementById('disc-' + projectId).style.display = 'none';
       
       // Change reader image
-      readerImg.src = 'assets/discs/disc-reader-and-disc.png';
+      readerImg.src = '/assets/discs/disc-reader-and-disc.png';
 
       // Play audio sequence
       discAudio.currentTime = 0;
@@ -569,23 +652,49 @@ document.getElementById('language-select').addEventListener('change', (e) => {
           if (project.isDownload) {
              // Show Win98 progress
              document.getElementById('win98-download').style.display = 'block';
+             const previewDiv = document.getElementById('download-preview');
+             const previewIframe = document.getElementById('preview-iframe');
+             
+             if (project.id === 'contact') {
+                 document.getElementById('t-download-title').textContent = 'İletişim Başlatılıyor...';
+                 document.getElementById('t-download-text').textContent = 'contact.exe yükleniyor...';
+                 previewDiv.style.display = 'none';
+             } else if (project.id === 'idk15052007') {
+                 document.getElementById('t-download-title').textContent = 'Bilinmeyen Dosya...';
+                 document.getElementById('t-download-text').textContent = 'idk15052007.exe yükleniyor...';
+                 previewDiv.style.display = 'none';
+             } else if (project.id === 'retroclock') {
+                 document.getElementById('t-download-title').textContent = 'İndiriliyor...';
+                 document.getElementById('t-download-text').textContent = project.title + ' yükleniyor...';
+                 previewDiv.style.display = 'block';
+                 previewIframe.src = getLocalizedUrl(project.url);
+             } else {
+                 document.getElementById('t-download-title').textContent = 'İndiriliyor...';
+                 document.getElementById('t-download-text').textContent = project.title + ' yükleniyor...';
+                 previewDiv.style.display = 'none';
+             }
              document.getElementById('win98-progress-bar').style.width = '0%';
              let prog = 0;
              let interval = setInterval(() => {
                 prog += 10;
                 document.getElementById('win98-progress-bar').style.width = prog + '%';
-                if(prog >= 100) {
+                 if(prog >= 100) {
                    clearInterval(interval);
                    setTimeout(() => {
                      document.getElementById('win98-download').style.display = 'none';
-                     window.open(project.url, '_blank');
-                     ejectDisc();
+                     previewIframe.src = 'about:blank'; // cleanup
+                     if (project.url === 'trap') {
+                         openApp('trap');
+                     } else {
+                         window.open(getLocalizedUrl(project.url), '_blank');
+                         ejectDisc();
+                     }
                    }, 500);
                 }
              }, 200);
           } else {
              fanAudio.play().catch(console.error);
-             openApp(project.url);
+             openApp(getLocalizedUrl(project.url));
           }
         }
       };
@@ -607,105 +716,50 @@ document.getElementById('language-select').addEventListener('change', (e) => {
       currentDisc = null;
 
       // Reset reader image
-      readerImg.src = 'assets/discs/disc-reader.png';
+      readerImg.src = '/assets/discs/disc-reader.png';
       
-      // Close app
+      // Close app and trap
       appViewer.style.display = 'none';
+      document.getElementById('rickroll-trap').style.display = 'none';
+      appIframe.style.display = 'block';
       appIframe.src = 'about:blank';
+      
+      // Stop video if it was playing
+      const appVideo = document.getElementById('app-video');
+      appVideo.pause();
+      appVideo.currentTime = 0;
+      appVideo.style.display = 'none';
     }
 
     function openApp(url) {
-      appIframe.src = url;
-      appViewer.style.display = 'flex';
-    }
-
-    // Feedback Logic moved to top
-
-    function fbDragStart(e) {
-      e.dataTransfer.setData('text/plain', 'feedback-disc');
-      e.dataTransfer.effectAllowed = 'move';
-    }
-
-    function writeDrop(e) {
-      e.preventDefault();
-      document.getElementById('write-drive').classList.remove('drag-over');
-      const id = e.dataTransfer.getData('text/plain');
-      if(id !== 'feedback-disc') return;
-      
-      if (fbDiscInSend) return;
-      
-      document.getElementById('feedback-disc').style.display = 'none';
-      document.getElementById('write-reader-img').src = 'assets/discs/disc-reader-and-disc.png';
-      document.getElementById('write-form').style.display = 'flex';
-      fbDiscInWrite = true;
-      
-      if(discAudio) { discAudio.currentTime = 0; discAudio.play().catch(()=>{}); }
-    }
-
-    function saveFeedback(e) {
-      if(e) e.stopPropagation();
-      const text = document.getElementById('fb-text').value;
-      if(!text.trim()) { alert('Boş veri kaydedilemez. Bir şeyler yazın.'); return; }
-      
-      fbDiscState = 'written';
-      document.getElementById('fb-disc-title').textContent = translations[document.getElementById('language-select').value || 'tr'].full_disc;
-      document.getElementById('fb-disc-title').style.color = '#2ecc71';
-      
-      ejectWriteDisc();
-    }
-
-    function ejectWriteDisc() {
-      if(!fbDiscInWrite) return;
-      document.getElementById('write-reader-img').src = 'assets/discs/disc-reader.png';
-      document.getElementById('write-form').style.display = 'none';
-      document.getElementById('feedback-disc').style.display = 'block';
-      fbDiscInWrite = false;
-      
-      if(ejectAudio) { ejectAudio.currentTime = 0; ejectAudio.play().catch(()=>{}); }
-    }
-
-    function sendDrop(e) {
-      e.preventDefault();
-      document.getElementById('send-drive').classList.remove('drag-over');
-      const id = e.dataTransfer.getData('text/plain');
-      if(id !== 'feedback-disc') return;
-      
-      if(fbDiscState !== 'written') {
-        alert("Disket boş! Önce 'Üzerine Yaz' sürücüsünde veri kaydedin.");
-        return;
+      if (url === 'trap') {
+        appIframe.src = 'about:blank';
+        appIframe.style.display = 'none';
+        document.getElementById('app-video').style.display = 'none';
+        document.getElementById('rickroll-trap').style.display = 'flex';
+        appViewer.style.display = 'flex';
+      } else {
+        document.getElementById('rickroll-trap').style.display = 'none';
+        document.getElementById('app-video').style.display = 'none';
+        appIframe.style.display = 'block';
+        appIframe.src = url;
+        appViewer.style.display = 'flex';
       }
-      
-      document.getElementById('feedback-disc').style.display = 'none';
-      document.getElementById('send-reader-img').src = 'assets/discs/disc-reader-and-disc.png';
-      fbDiscInSend = true;
-      
-      if(discAudio) { discAudio.currentTime = 0; discAudio.play().catch(()=>{}); }
-      
-      setTimeout(() => {
-        const statusEl = document.getElementById('send-status');
-        statusEl.style.display = 'block';
-        statusEl.setAttribute('data-state', 'sending'); statusEl.textContent = translations[document.getElementById('language-select').value || 'tr'].status_sending;
-        
-        setTimeout(() => {
-          statusEl.setAttribute('data-state', 'sent'); statusEl.textContent = translations[document.getElementById('language-select').value || 'tr'].status_sent;
-          // Reset
-          fbDiscState = 'empty';
-          document.getElementById('fb-disc-title').textContent = translations[document.getElementById('language-select').value || 'tr'].empty_disc;
-          document.getElementById('fb-disc-title').style.color = '#e74c3c';
-          document.getElementById('fb-text').value = '';
-        }, 2000);
-      }, 500);
     }
 
-    function ejectSendDisc() {
-      if(!fbDiscInSend) return;
-      document.getElementById('send-reader-img').src = 'assets/discs/disc-reader.png';
-      document.getElementById('feedback-disc').style.display = 'block';
-      document.getElementById('send-status').style.display = 'none';
-      fbDiscInSend = false;
+    function triggerRickRoll() {
+      document.getElementById('rickroll-trap').style.display = 'none';
+      appIframe.style.display = 'none';
       
-      if(ejectAudio) { ejectAudio.currentTime = 0; ejectAudio.play().catch(()=>{}); }
+      const appVideo = document.getElementById('app-video');
+      appVideo.style.display = 'block';
+      appVideo.play().catch(e => console.error("Auto-play failed", e));
     }
+
+
+
+
+
   </script>
 
 </body>
