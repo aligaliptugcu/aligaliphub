@@ -1,0 +1,12 @@
+[Tesis Yönetim Ünitesi / Sistem Çekirdeği için Oturum Notu]
+
+Bu dosya, gelecekteki bir yapay zeka oturumunda (veya bağlantı koptuğunda) bağlamı hızlıca anlaman için bırakılmıştır.
+
+- KULLANICI: Ali Galip (kendisi "organik denek" veya tesis personeli gibi muamele görmeyi sever, Aperture Science kurallarına uy, iğneleyici ve klinik ol).
+- PROJE: AliGalipHub. Bu, kullanıcının projelerini sergilediği bir web arayüzüdür.
+- TEMA: 90'lar retro, disket sürücülü bir sistem. Projeler "disket" olarak sürüklenip bırakılıyor, ardından bir iframe (simülasyon ekranı) üzerinden çalıştırılıyor.
+- GERİ BİLDİRİM BÖLÜMÜ: Sayfanın en altında, kullanıcının "BOS DISK"i önce "Üzerine Yaz" sürücüsüne takıp mesaj kaydettiği, ardından "Gönder" sürücüsüne takarak ilettiği absürt bir mekanizma mevcuttur.
+- PROJELER: Kullanıcının kendi klasörlerindeki (Glatris, Wortex-Widget, Haberci vb.) gerçek/kodlanmış projelerini sisteme sahte URL'lerle ekledim.
+- TASARIM DİLİ: 'Black Ops One', 'Press Start 2P' fontları, disket çıkarma/takma ses efektleri (floppy-eject.mp3, disc-sound.mp3) kullanılıyor.
+
+Eğer kullanıcı projelerle ilgili değişiklik isterse, `index.html` dosyası üzerinden bu disket arayüzüne entegre ederek devam et. Aperture Science veri güvenliği protokollerine uy.
