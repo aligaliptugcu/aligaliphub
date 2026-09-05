@@ -1,0 +1,8 @@
+# AliGalipHub
+
+Ali Galip's project archive and interactive web hub.
+
+## Links
+- [A WebSite Space](https://www.awebsite.space)
+- [Haberci](https://github.com/aligaliptugcu/aligaliphub/releases/download/v1.0/Haberci.zip)
+- [NotTasks](https://github.com/aligaliptugcu/aligaliphub/releases/download/v1.0/NotTasks.zip)
