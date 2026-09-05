@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-width=1.0">
   <meta name="description" content="Ali Galip's project archive and interactive web hub.">
   <title>AliGalipHub</title>
+  <link rel="icon" href="/assets/aligaliphub-icon.png" type="image/png">
   
   <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css?family=Black+Ops+One&display=swap" rel="stylesheet">
@@ -495,7 +496,7 @@
             splashScreen.style.display = 'none';
             siteWrapper.style.display = 'block';
             document.body.style.overflow = '';
-        }, 2000);
+        }, 4000);
     }, 1000);
     // -----------------------------
 
@@ -628,6 +629,12 @@
       wrapper.draggable = true;
       wrapper.id = 'disc-' + p.id;
       
+      
+      wrapper.addEventListener('dblclick', () => {
+        const fakeEvent = { dataTransfer: { getData: () => p.id } };
+        dropHandler(fakeEvent);
+      });
+
       wrapper.addEventListener('dragstart', (e) => {
         e.dataTransfer.setData('text/plain', p.id);
         e.dataTransfer.effectAllowed = 'move';
@@ -814,15 +821,47 @@
       
       const appVideo = document.getElementById('app-video');
       appVideo.style.display = 'block';
+
       appVideo.play().catch(e => console.error("Auto-play failed", e));
     }
 
 
-
-
-
+    // Mobile Touch Drag Delay Logic for all discs (Dynamic + Static)
+    document.querySelectorAll('.floppy-wrapper').forEach(w => {
+      // Ensure all disks have double click (the dynamic ones already have it, but static ones need it)
+      w.ondblclick = (e) => {
+        let discId = w.id.replace('disc-', '');
+        if (discId) dropHandler({ dataTransfer: { getData: () => discId } });
+      };
+      
+      // Mobile Drag Delay Setup
+      w.draggable = false; 
+      let dragTimeout;
+      w.addEventListener('touchstart', function(e) {
+         if (w.getAttribute('data-drag-ready') !== 'true') {
+             dragTimeout = setTimeout(() => {
+                 w.draggable = true;
+                 w.setAttribute('data-drag-ready', 'true');
+                 if(navigator.vibrate) navigator.vibrate(30);
+             }, 400); // 400ms hold to drag
+         }
+      }, {passive: true});
+      
+      w.addEventListener('touchend', function(e) {
+         clearTimeout(dragTimeout);
+         setTimeout(() => {
+             w.draggable = false;
+             w.removeAttribute('data-drag-ready');
+         }, 100);
+      }, {passive: true});
+      
+      w.addEventListener('touchmove', function(e) {
+         if (w.getAttribute('data-drag-ready') !== 'true') {
+             clearTimeout(dragTimeout);
+         }
+      }, {passive: true});
+    });
   </script>
-
   </div>
 </body>
 </html>
