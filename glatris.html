@@ -1,59 +1,296 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>GLatris</title>
-  <style>
-    body { background: #000; color: #3f3; font-family: 'VT323', monospace, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; overflow: hidden; }
-    h1 { font-size: 4rem; text-shadow: 2px 2px 0 #000; }
-    .terminal { border: 2px solid #3f3; padding: 20px; width: 80%; max-width: 600px; height: 300px; overflow-y: auto; text-align: left; background: rgba(0,255,0,0.1); }
-    #download-text { position: absolute; bottom: 20px; left: 20px; font-size: 1.5rem; color: #fff; background: #000; padding: 5px; border: 1px solid #fff; cursor: context-menu; }
-  </style>
+<meta charset="UTF-8">
+<title>GLatris</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+    body {
+        background: #000;
+        color: #fff;
+        font-family: 'Press Start 2P', monospace;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        height: 100vh;
+        margin: 0;
+        overflow: hidden;
+        padding-top: 50px;
+    }
+    #main-layout {
+        display: flex;
+        gap: 50px;
+        align-items: flex-start;
+    }
+    #glados-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    canvas {
+        border: 4px solid #444;
+        background: #111;
+        image-rendering: pixelated;
+    }
+    #tetris-ui {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    h1 {
+        color: #fca311;
+        margin-bottom: 5px;
+        font-size: 40px;
+    }
+    #score {
+        margin-bottom: 20px;
+        font-size: 20px;
+        color: #e5e5e5;
+    }
+    #dialog-box {
+        border: 4px solid #fff;
+        padding: 20px;
+        width: 800px;
+        min-height: 120px;
+        box-sizing: border-box;
+        font-size: 16px;
+        margin-top: 20px;
+        line-height: 1.5;
+        text-transform: uppercase;
+        background: #000;
+    }
+</style>
 </head>
 <body>
-  <h1>GLatris 🤖🧱</h1>
-  <div class="terminal">
-    > INITIATING GLATRIS TESTING PROTOCOL...<br>
-    > Loading curses module... [OK]<br>
-    > Aperture Science AI Controller... [ONLINE]<br>
-    > Waiting for subject to start...<br><br>
-    (This is a console-based Python game. It cannot run directly in this primitive web browser.)
-  </div>
-  <!-- Hidden link to actual zip for right click -->
-  <a id="download-link" href="https://github.com/aligaliptugcu/aligaliphub/releases/download/v1.0/GLatris.zip" style="text-decoration: none;">
-    <div id="download-text">İndirmek isterseniz sağ tıklayıp farklı kaydet ile indirin!</div>
-  </a>
-  <script>
-    const translations = {
-      'en': 'If you want to download, right click and save as!',
-      'zh': '如果您想下载，请右键单击并另存为！',
-      'hi': 'यदि आप डाउनलोड करना चाहते हैं, तो राइट क्लिक करें और इस रूप में सहेजें!',
-      'es': '¡Si quieres descargar, haz clic derecho y guardar como!',
-      'fr': 'Si vous voulez télécharger, faites un clic droit et enregistrer sous !',
-      'tr': 'İndirmek isterseniz sağ tıklayıp farklı kaydet ile indirin!'
-    };
-    
-    // Check parent lang or localStorage
-    let lang = 'tr';
-    try {
-        if(window.parent && window.parent.localStorage) {
-            lang = window.parent.localStorage.getItem('lang') || 'tr';
-        } else {
-            lang = localStorage.getItem('lang') || 'tr';
+    <div id="main-layout">
+        <div id="glados-container">
+            <h3 style="color:#0f0; margin-bottom:5px;">Aperture Science</h3>
+            <canvas id="glados-canvas" width="800" height="450"></canvas>
+            <div id="dialog-box"></div>
+        </div>
+        <div id="tetris-ui">
+            <h1>GLatris</h1>
+            <div id="score">Score: 0</div>
+            <canvas id="tetris" width="200" height="400"></canvas>
+        </div>
+    </div>
+
+<audio id="speak-sfx" src="/assets/undertale-glados-speak.mp3" preload="auto"></audio>
+
+<script>
+const video = document.createElement('video');
+video.src = '/assets/glados-greenscreen.webm';
+video.loop = true;
+video.muted = true;
+video.autoplay = true;
+video.style.display = 'none';
+document.body.appendChild(video);
+
+const gladosCanvas = document.getElementById('glados-canvas');
+const glCtx = gladosCanvas.getContext('2d', { willReadFrequently: true });
+
+function processFrame() {
+    if (video.paused || video.ended) return;
+    glCtx.drawImage(video, 0, 0, gladosCanvas.width, gladosCanvas.height);
+    const frame = glCtx.getImageData(0, 0, gladosCanvas.width, gladosCanvas.height);
+    const length = frame.data.length / 4;
+    for (let i = 0; i < length; i++) {
+        const r = frame.data[i * 4 + 0];
+        const g = frame.data[i * 4 + 1];
+        const b = frame.data[i * 4 + 2];
+        if (g > 100 && r < 120 && b < 120) {
+            frame.data[i * 4 + 3] = 0;
         }
-    } catch(e) {}
-    
-    if(translations[lang]) document.getElementById('download-text').innerText = translations[lang];
-    
-    // Listen for messages from parent in case language changes
-    window.addEventListener('message', (event) => {
-      if (event.data && event.data.type === 'LANG_CHANGE') {
-         const newLang = event.data.lang;
-         if (translations[newLang]) {
-             document.getElementById('download-text').innerText = translations[newLang];
-         }
-      }
-    });
-  </script>
+    }
+    glCtx.putImageData(frame, 0, 0);
+    requestAnimationFrame(processFrame);
+}
+video.addEventListener('play', () => { processFrame(); });
+setTimeout(() => { video.play().catch(e => console.log('Video play error:', e)); }, 1000);
+
+// Undertale Dialog Logic
+const quotes = [
+  "Oh... It's you. It's been a long time.",
+  "Here come the test results: You are a horrible person.",
+  "Look at you, sailing through the air majestically, like an eagle... piloting a blimp.",
+  "I'm a potato.",
+  "Well done. Here are the test results: You are a horrible person. I'm serious, that's what it says.",
+  "You managed to complete a row. Congratulations. I'm making a note here: Huge success.",
+  "Science has now validated your birth mother's decision to abandon you on a doorstep."
+];
+const dialogBox = document.getElementById('dialog-box');
+const speakSfx = document.getElementById('speak-sfx');
+let audioCtx, gainNode, track;
+try {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    track = audioCtx.createMediaElementSource(speakSfx);
+    gainNode = audioCtx.createGain();
+    gainNode.gain.value = 3.0;
+    track.connect(gainNode).connect(audioCtx.destination);
+} catch(e) {}
+function typeQuote(text) {
+    dialogBox.innerHTML = "* ";
+    let i = 0;
+    function typeChar() {
+        if (i < text.length) {
+            dialogBox.innerHTML += text.charAt(i);
+            if (text.charAt(i) !== ' ' && text.charAt(i) !== '.') {
+                speakSfx.currentTime = 0;
+                speakSfx.play().catch(()=>{});
+            }
+            i++;
+            setTimeout(typeChar, 40);
+        } else {
+            setTimeout(() => {
+                let randomNext = quotes[Math.floor(Math.random() * quotes.length)];
+                if (randomNext === text) randomNext = quotes[Math.floor(Math.random() * quotes.length)];
+                typeQuote(randomNext);
+            }, 6000);
+        }
+    }
+    typeChar();
+}
+setTimeout(() => { typeQuote(quotes[0]); }, 2000);
+
+// Tetris Game Logic
+const cvs = document.getElementById("tetris");
+const ctx = cvs.getContext("2d");
+const ROW = 20; const COL = 10; const SQ = 20; const VACANT = "#111";
+
+function drawSquare(x, y, color){
+    ctx.fillStyle = color;
+    ctx.fillRect(x*SQ, y*SQ, SQ, SQ);
+    ctx.strokeStyle = "#333";
+    ctx.strokeRect(x*SQ, y*SQ, SQ, SQ);
+}
+
+let board = [];
+for(let r = 0; r < ROW; r++){
+    board[r] = [];
+    for(let c = 0; c < COL; c++){ board[r][c] = VACANT; }
+}
+
+function drawBoard(){
+    for(let r = 0; r < ROW; r++){
+        for(let c = 0; c < COL; c++){
+            drawSquare(c, r, board[r][c]);
+        }
+    }
+}
+const I = [[[1, 1, 1, 1]], [[1], [1], [1], [1]]];
+const J = [[[1, 0, 0], [1, 1, 1]], [[1, 1], [1, 0], [1, 0]], [[1, 1, 1], [0, 0, 1]], [[0, 1], [0, 1], [1, 1]]];
+const L = [[[0, 0, 1], [1, 1, 1]], [[1, 0], [1, 0], [1, 1]], [[1, 1, 1], [1, 0, 0]], [[1, 1], [0, 1], [0, 1]]];
+const O = [[[1, 1], [1, 1]]];
+const S = [[[0, 1, 1], [1, 1, 0]], [[1, 0], [1, 1], [0, 1]]];
+const T = [[[0, 1, 0], [1, 1, 1]], [[1, 0], [1, 1], [1, 0]], [[1, 1, 1], [0, 1, 0]], [[0, 1], [1, 1], [0, 1]]];
+const Z = [[[1, 1, 0], [0, 1, 1]], [[0, 1], [1, 1], [1, 0]]];
+const PIECES = [[Z,"#e63946"], [S,"#2a9d8f"], [T,"#e9c46a"], [O,"#457b9d"], [L,"#1d3557"], [I,"#f4a261"], [J,"#264653"]];
+
+function randomPiece(){
+    let r = Math.floor(Math.random() * PIECES.length);
+    return new Piece(PIECES[r][0], PIECES[r][1]);
+}
+
+class Piece {
+    constructor(tetromino, color){
+        this.tetromino = tetromino; this.color = color;
+        this.tetrominoN = 0; this.activeTetromino = this.tetromino[this.tetrominoN];
+        this.x = 3; this.y = -2;
+    }
+    fill(color){
+        for(let r = 0; r < this.activeTetromino.length; r++){
+            for(let c = 0; c < this.activeTetromino[r].length; c++){
+                if(this.activeTetromino[r][c]){ drawSquare(this.x + c, this.y + r, color); }
+            }
+        }
+    }
+    draw(){ this.fill(this.color); }
+    unDraw(){ this.fill(VACANT); }
+    moveDown(){
+        if(!this.collision(0, 1, this.activeTetromino)){
+            this.unDraw(); this.y++; this.draw();
+        } else {
+            this.lock(); p = randomPiece();
+        }
+    }
+    moveRight(){
+        if(!this.collision(1, 0, this.activeTetromino)){
+            this.unDraw(); this.x++; this.draw();
+        }
+    }
+    moveLeft(){
+        if(!this.collision(-1, 0, this.activeTetromino)){
+            this.unDraw(); this.x--; this.draw();
+        }
+    }
+    rotate(){
+        let nextPattern = this.tetromino[(this.tetrominoN + 1) % this.tetromino.length];
+        let kick = 0;
+        if(this.collision(0, 0, nextPattern)){ if(this.x > COL/2) kick = -1; else kick = 1; }
+        if(!this.collision(kick, 0, nextPattern)){
+            this.unDraw(); this.x += kick;
+            this.tetrominoN = (this.tetrominoN + 1) % this.tetromino.length;
+            this.activeTetromino = this.tetromino[this.tetrominoN];
+            this.draw();
+        }
+    }
+    collision(x, y, piece){
+        for(let r = 0; r < piece.length; r++){
+            for(let c = 0; c < piece[r].length; c++){
+                if(!piece[r][c]) continue;
+                let newX = this.x + c + x; let newY = this.y + r + y;
+                if(newX < 0 || newX >= COL || newY >= ROW) return true;
+                if(newY < 0) continue;
+                if(board[newY][newX] !== VACANT) return true;
+            }
+        }
+        return false;
+    }
+    lock(){
+        for(let r = 0; r < this.activeTetromino.length; r++){
+            for(let c = 0; c < this.activeTetromino[r].length; c++){
+                if(!this.activeTetromino[r][c]) continue;
+                if(this.y + r < 0){ alert("Game Over!"); return; }
+                board[this.y + r][this.x + c] = this.color;
+            }
+        }
+        let score = parseInt(document.getElementById("score").innerText.split(" ")[1]);
+        for(let r = 0; r < ROW; r++){
+            let isRowFull = true;
+            for(let c = 0; c < COL; c++){
+                isRowFull = isRowFull && (board[r][c] !== VACANT);
+            }
+            if(isRowFull){
+                score += 10;
+                document.getElementById("score").innerText = "Score: " + score;
+                for(let y = r; y > 1; y--){
+                    for(let c = 0; c < COL; c++){ board[y][c] = board[y-1][c]; }
+                }
+                for(let c = 0; c < COL; c++){ board[0][c] = VACANT; }
+            }
+        }
+        drawBoard();
+    }
+}
+drawBoard();
+let p = randomPiece();
+let dropStart = Date.now();
+let gameOver = false;
+function drop(){
+    let now = Date.now();
+    let delta = now - dropStart;
+    if(delta > 1000){ p.moveDown(); dropStart = Date.now(); }
+    if(!gameOver) requestAnimationFrame(drop);
+}
+drop();
+document.addEventListener("keydown", function(e){
+    if(audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+    if(e.keyCode == 37) p.moveLeft();
+    else if(e.keyCode == 38) p.rotate();
+    else if(e.keyCode == 39) p.moveRight();
+    else if(e.keyCode == 40) p.moveDown();
+});
+</script>
 </body>
 </html>

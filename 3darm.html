@@ -3,8 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>3D Robot Kol - Gerçekçi Fizik (Cannon.js)</title>
+  <title>The Amazing Digital 3D World</title>
   
+  <!-- Three.js Import Map -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+
   <!-- MediaPipe Kütüphaneleri -->
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils@0.3.1640029074/camera_utils.js" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils@0.6.1629159505/control_utils.js" crossorigin="anonymous"></script>
@@ -14,7 +24,7 @@
   <style>
     body { margin: 0; overflow: hidden; background-color: #0d0f14; font-family: 'Segoe UI', sans-serif; user-select: none; }
     
-    #debug-hud { position: absolute; top: 15px; left: 15px; background: rgba(12, 15, 22, 0.94); border: 1px solid #00f0ff; padding: 16px 20px; border-radius: 10px; color: #00f0ff; font-family: 'Courier New', monospace; font-size: 12px; line-height: 1.6; box-shadow: 0 0 25px rgba(0, 240, 255, 0.25); pointer-events: none; display: none; min-width: 310px; backdrop-filter: blur(5px); z-index: 100; }
+    #debug-hud { position: absolute; top: 60px; left: 15px; background: rgba(12, 15, 22, 0.94); border: 1px solid #00f0ff; padding: 16px 20px; border-radius: 10px; color: #00f0ff; font-family: 'Courier New', monospace; font-size: 12px; line-height: 1.6; box-shadow: 0 0 25px rgba(0, 240, 255, 0.25); pointer-events: none; display: none; min-width: 310px; backdrop-filter: blur(5px); z-index: 100; }
     #debug-hud h3 { margin: 0 0 10px 0; font-size: 14px; color: #ffffff; border-bottom: 1px solid rgba(0, 240, 255, 0.3); padding-bottom: 6px; display: flex; justify-content: space-between; align-items: center; }
     .status-badge { padding: 3px 8px; border-radius: 4px; font-weight: bold; font-size: 11px; letter-spacing: 0.5px; }
     .status-held { background: #00ff66; color: #000; }
@@ -22,6 +32,49 @@
 
     #cam-container { position: absolute; bottom: 15px; right: 15px; width: 240px; height: 180px; border: 2px solid #00f0ff; border-radius: 10px; overflow: hidden; display: none; box-shadow: 0 0 25px rgba(0, 240, 255, 0.25); z-index: 100; background: #000; }
     #input_video, #output_canvas { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
+
+    /* MODEL YÜKLEME BUTONU VE SÜRÜKLE-BIRAK ALANI */
+    .upload-btn {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      color: #00f0ff;
+      font-size: 12px;
+      font-weight: bold;
+      font-family: 'Courier New', monospace;
+      background: rgba(12, 15, 22, 0.88);
+      padding: 8px 16px;
+      border: 1px solid #00f0ff;
+      border-radius: 6px;
+      z-index: 150;
+      cursor: pointer;
+      box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
+      transition: all 0.2s ease;
+      backdrop-filter: blur(5px);
+    }
+    .upload-btn:hover {
+      background: rgba(0, 240, 255, 0.25);
+      box-shadow: 0 0 25px rgba(0, 240, 255, 0.5);
+      transform: translateY(-2px);
+    }
+
+    #drop-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 240, 255, 0.12);
+      border: 4px dashed #00f0ff;
+      z-index: 9999;
+      pointer-events: none;
+      align-items: center;
+      justify-content: center;
+      color: #00f0ff;
+      font-family: 'Courier New', monospace;
+      font-size: 22px;
+      font-weight: bold;
+      text-shadow: 0 0 12px #00f0ff;
+      box-sizing: border-box;
+    }
 
     /* KONTROL PANELİ */
     #settings-panel { position: absolute; top: 60px; right: 15px; width: 290px; background: rgba(12, 15, 22, 0.94); border: 1px solid #ffaa00; padding: 18px 20px; border-radius: 10px; color: #ffaa00; font-family: 'Courier New', monospace; font-size: 13px; line-height: 1.8; box-shadow: 0 0 30px rgba(255, 170, 0, 0.25); display: none; backdrop-filter: blur(5px); z-index: 200; }
@@ -36,6 +89,13 @@
   </style>
 </head>
 <body>
+
+<div id="upload-btn" class="upload-btn">📁 3D MODEL YÜKLE (.obj, .fbx, .glb)</div>
+<input type="file" id="model-file-input" accept=".obj,.fbx,.glb,.gltf" multiple style="display:none;">
+
+<div id="drop-overlay">
+  [ 3D MODELİ BURAYA BIRAKIN (.obj, .fbx, .glb) ]
+</div>
 
 <div class="panel-hint" id="hint-btn">KONTROL PANELİ İÇİN [P] BAZINIZ</div>
 
@@ -95,22 +155,24 @@
   const lang = localStorage.getItem('lang') || 'tr';
   const i18n = {
     tr: {
-      title: "3D Robot Kol - Gerçekçi Fizik (Cannon.js)",
-      hint: "KONTROL PANELİ İÇİN [P] BAZINIZ",
+      title: "The Amazing Digital 3D World",
+      hint: "KONTROL PANELİ İÇİN [P] BASINIZ",
       panel_title: "APERTURE KONTROL PANELİ",
       lbl_graphics: "Görsel Kalite Motoru",
-      opt_low: "Tasarruf", opt_med: "Normal", opt_high: "Yüksek",
+      opt_low: "Düşük (Tasarruf)", opt_med: "Orta (Normal)", opt_high: "Yüksek",
       lbl_sensor: "Biyometrik El Sensörü",
       lbl_cam: "Kamera İskelet Önizlemesi",
       lbl_grip: "Merkezi Kavrama (Mıknatıs)",
       lbl_glitch: "Yerçekimi Anomalisi (Glitch)",
       hints: "[A] KÜP SENTEZLE &nbsp;&nbsp;|&nbsp;&nbsp; [R] KÜP YOK ET",
       sensor_lbl: "KİNESTETİK SENSÖR",
+      upload_btn: "📁 3D MODEL YÜKLE (.obj, .fbx, .glb)",
+      drop_hint: "[ 3D MODELİ BURAYA BIRAKIN (.obj, .fbx, .glb) ]",
       debug_title: "HATA AYIKLAMA (DEBUG)",
       sys_status: "Sistem Durumu:",
       hand_sensor: "El Sensörü:",
       gravity: "Yerçekimi Alanı:",
-      test_cubes: "Test Küpleri:",
+      test_cubes: "Test Nesneleri:",
       grip_mod: "Tutucu Modülü:",
       phys_engine: "Cannon.js Fizik Motoru:",
       phys_constraint: "Aktif Fizik Kısıtı (Constraint):",
@@ -118,25 +180,27 @@
       active: "AKTİF V0.20",
       off: "KAPALI", on: "AÇIK",
       norm_g: "NORMAL (1G)", ceil_g: "TAVAN YERÇEKİMİ AKTİF!",
-      free: "SERBEST", locked: "KİLİTLİ", none: t.none
+      free: "SERBEST", locked: "KİLİTLİ", none: "YOK"
     },
     en: {
-      title: "3D Robotic Arm - Realistic Physics",
+      title: "The Amazing Digital 3D World",
       hint: "PRESS [P] FOR CONTROL PANEL",
       panel_title: "APERTURE CONTROL PANEL",
       lbl_graphics: "Visual Quality Engine",
-      opt_low: "Economy", opt_med: "Normal", opt_high: "High",
+      opt_low: "Low (Economy)", opt_med: "Medium (Normal)", opt_high: "High",
       lbl_sensor: "Biometric Hand Sensor",
       lbl_cam: "Camera Skeleton Preview",
       lbl_grip: "Central Grip (Magnet)",
       lbl_glitch: "Gravity Anomaly (Glitch)",
       hints: "[A] SYNTHESIZE CUBE &nbsp;&nbsp;|&nbsp;&nbsp; [R] DESTROY CUBE",
       sensor_lbl: "KINESTHETIC SENSOR",
+      upload_btn: "📁 UPLOAD 3D MODEL (.obj, .fbx, .glb)",
+      drop_hint: "[ DROP 3D MODEL HERE (.obj, .fbx, .glb) ]",
       debug_title: "DEBUGGING",
       sys_status: "System Status:",
       hand_sensor: "Hand Sensor:",
       gravity: "Gravity Field:",
-      test_cubes: "Test Cubes:",
+      test_cubes: "Test Objects:",
       grip_mod: "Gripper Module:",
       phys_engine: "Cannon.js Physics Engine:",
       phys_constraint: "Active Physics Constraint:",
@@ -149,19 +213,37 @@
   };
   const t = i18n[lang] || i18n['en'];
   document.title = t.title;
-  window.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('hint-btn').innerText = t.hint;
-    document.querySelector('#settings-panel h3').innerText = t.panel_title;
-    document.querySelector('label[for="sel-graphics"]').innerText = t.lbl_graphics;
-    const opts = document.getElementById('sel-graphics').options;
-    opts[0].innerText = t.opt_low; opts[1].innerText = t.opt_med; opts[2].innerText = t.opt_high;
-    document.querySelector('label[for="chk-sensor"]').innerText = t.lbl_sensor;
-    document.querySelector('label[for="chk-cam-view"]').innerText = t.lbl_cam;
-    document.querySelector('label[for="chk-grip-mode"]').innerText = t.lbl_grip;
-    document.querySelector('label[for="chk-glitch"]').innerText = t.lbl_glitch;
-    document.querySelector('#settings-panel div:last-child').innerHTML = t.hints;
-    document.querySelector('#cam-container div').innerText = t.sensor_lbl;
-    document.querySelector('#debug-hud h3 span:first-child').innerText = t.debug_title;
+  function initUI() {
+    const hintBtn = document.getElementById('hint-btn');
+    if (hintBtn) hintBtn.innerText = t.hint;
+    const uploadBtn = document.getElementById('upload-btn');
+    if (uploadBtn) uploadBtn.innerText = t.upload_btn;
+    const dropOverlay = document.getElementById('drop-overlay');
+    if (dropOverlay) dropOverlay.innerText = t.drop_hint;
+    const panelH3 = document.querySelector('#settings-panel h3');
+    if (panelH3) panelH3.innerText = t.panel_title;
+    const lblGraphics = document.querySelector('label[for="sel-graphics"]');
+    if (lblGraphics) lblGraphics.innerText = t.lbl_graphics;
+    const selG = document.getElementById('sel-graphics');
+    if (selG && selG.options && selG.options.length >= 3) {
+      selG.options[0].innerText = t.opt_low;
+      selG.options[1].innerText = t.opt_med;
+      selG.options[2].innerText = t.opt_high;
+    }
+    const lblSensor = document.querySelector('label[for="chk-sensor"]');
+    if (lblSensor) lblSensor.innerText = t.lbl_sensor;
+    const lblCam = document.querySelector('label[for="chk-cam-view"]');
+    if (lblCam) lblCam.innerText = t.lbl_cam;
+    const lblGrip = document.querySelector('label[for="chk-grip-mode"]');
+    if (lblGrip) lblGrip.innerText = t.lbl_grip;
+    const lblGlitch = document.querySelector('label[for="chk-glitch"]');
+    if (lblGlitch) lblGlitch.innerText = t.lbl_glitch;
+    const panelLastChild = document.querySelector('#settings-panel div:last-child');
+    if (panelLastChild) panelLastChild.innerHTML = t.hints;
+    const camDiv = document.querySelector('#cam-container div');
+    if (camDiv) camDiv.innerText = t.sensor_lbl;
+    const hudTitle = document.querySelector('#debug-hud h3 span:first-child');
+    if (hudTitle) hudTitle.innerText = t.debug_title;
     
     const ddivs = document.querySelectorAll('#debug-hud div b');
     if(ddivs.length >= 7) {
@@ -173,17 +255,33 @@
       ddivs[5].innerText = t.phys_engine;
       ddivs[6].innerText = t.phys_constraint;
     }
-    document.getElementById('hud-mode').innerText = t.debug_active;
-    document.getElementById('hud-hand').innerText = t.off;
-    document.getElementById('hud-glitch-mode').innerText = t.norm_g;
-    document.getElementById('hud-status-badge').innerText = t.free;
-    document.getElementById('hud-grip').innerText = t.free;
-    document.getElementById('hud-constraint').innerText = t.none;
-    document.querySelector('#debug-hud div:nth-child(9) span').innerText = t.active;
-  });
+    const hudMode = document.getElementById('hud-mode');
+    if (hudMode) hudMode.innerText = t.debug_active;
+    const hudHand = document.getElementById('hud-hand');
+    if (hudHand) hudHand.innerText = t.off;
+    const hudGlitch = document.getElementById('hud-glitch-mode');
+    if (hudGlitch) hudGlitch.innerText = t.norm_g;
+    const hudBadge = document.getElementById('hud-status-badge');
+    if (hudBadge) hudBadge.innerText = t.free;
+    const hudGrip = document.getElementById('hud-grip');
+    if (hudGrip) hudGrip.innerText = t.free;
+    const hudConstraint = document.getElementById('hud-constraint');
+    if (hudConstraint) hudConstraint.innerText = t.none;
+    const debugEngine = document.querySelector('#debug-hud div:nth-child(9) span');
+    if (debugEngine) debugEngine.innerText = t.active;
+  }
 
-  import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
+  if (document.readyState === 'loading') {
+    window.addEventListener('DOMContentLoaded', initUI);
+  } else {
+    initUI();
+  }
+
+  import * as THREE from 'three';
   import * as CANNON from 'https://cdn.jsdelivr.net/npm/cannon-es@0.20.0/dist/cannon-es.js/+esm';
+  import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+  import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
+  import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
 
   let isPanelOpen = false;
   let kinestheticEnabled = false;
@@ -370,11 +468,18 @@
       if (!isGripping) {
         isGripping = true;
         if (!heldCube && !activeConstraint) {
-            let closest = null; let minDist = TARGET_SIZE * 1.5;
-            const tipPos = new THREE.Vector3(); tipTarget.getWorldPosition(tipPos);
+            let closest = null; 
+            let minDist = Infinity;
+            const tipPos = new THREE.Vector3(); 
+            tipTarget.getWorldPosition(tipPos);
+
             cubes.forEach(c => {
                 const dist = tipPos.distanceTo(c.object.position);
-                if (dist < minDist) { minDist = dist; closest = c; }
+                const maxReach = c.size ? (Math.max(c.size.x, c.size.y, c.size.z) * 2.5) : (TARGET_SIZE * 1.5);
+                if (dist < maxReach && dist < minDist) { 
+                    minDist = dist; 
+                    closest = c; 
+                }
             });
             
             if (closest) {
@@ -397,36 +502,259 @@
         isGripping = false;
         if (heldCube && activeConstraint) {
             world.removeConstraint(activeConstraint);
-            activeConstraint = null; heldCube = null;
+            activeConstraint = null; 
+            heldCube = null;
         }
       }
     }
   }
 
-  window.addEventListener('mousemove', (e) => {
-    if (isHandTracking) return;
-    targetMouse.x = (e.clientX / window.innerWidth) * 2 - 1; targetMouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+  // --- 3D MODEL YÜKLEYİCİ (.obj, .fbx, .glb, .gltf) ---
+  const gltfLoader = new GLTFLoader();
+  const objLoader = new OBJLoader();
+  const fbxLoader = new FBXLoader();
+
+  const fileInput = document.getElementById('model-file-input');
+  const uploadBtn = document.getElementById('upload-btn');
+  const dropOverlay = document.getElementById('drop-overlay');
+
+  if (uploadBtn && fileInput) {
+    uploadBtn.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files && e.target.files.length > 0) {
+        Array.from(e.target.files).forEach(f => loadModelFromFile(f));
+        fileInput.value = '';
+      }
+    });
+  }
+
+  // Sürükle - Bırak (Drag & Drop) ile Model Yükleme
+  window.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    if (dropOverlay) dropOverlay.style.display = 'flex';
   });
-  window.addEventListener('mousedown', (e) => { if (e.button === 0 && !isHandTracking) triggerSqueeze(true); });
-  window.addEventListener('mouseup', (e) => { if (e.button === 0 && !isHandTracking) triggerSqueeze(false); });
+
+  window.addEventListener('dragleave', (e) => {
+    if (e.relatedTarget === null && dropOverlay) {
+      dropOverlay.style.display = 'none';
+    }
+  });
+
+  window.addEventListener('drop', (e) => {
+    e.preventDefault();
+    if (dropOverlay) dropOverlay.style.display = 'none';
+    if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      Array.from(e.dataTransfer.files).forEach(f => loadModelFromFile(f));
+    }
+  });
+
+  function loadModelFromFile(file) {
+    const fileName = file.name;
+    const ext = fileName.split('.').pop().toLowerCase();
+    const blobUrl = URL.createObjectURL(file);
+
+    function onLoaded(object) {
+      URL.revokeObjectURL(blobUrl);
+      addCustomModelToScene(object, fileName);
+    }
+
+    function onError(err) {
+      console.error("Model yüklenirken hata:", err);
+      alert("Model yükleme hatası (" + fileName + "): " + (err.message || err));
+      URL.revokeObjectURL(blobUrl);
+    }
+
+    try {
+      if (ext === 'glb' || ext === 'gltf') {
+        gltfLoader.load(blobUrl, (gltf) => onLoaded(gltf.scene), undefined, onError);
+      } else if (ext === 'obj') {
+        objLoader.load(blobUrl, onLoaded, undefined, onError);
+      } else if (ext === 'fbx') {
+        fbxLoader.load(blobUrl, onLoaded, undefined, onError);
+      } else {
+        alert("Desteklenmeyen model uzantısı: ." + ext + "\\nDesteklenenler: .glb, .gltf, .obj, .fbx");
+        URL.revokeObjectURL(blobUrl);
+      }
+    } catch (err) {
+      onError(err);
+    }
+  }
+
+  function addCustomModelToScene(model, name) {
+    model.traverse((child) => {
+      if (child.isMesh) {
+        child.castShadow = true;
+        child.receiveShadow = true;
+        if (!child.material) {
+          child.material = new THREE.MeshStandardMaterial({ color: 0x00f0ff, roughness: 0.3 });
+        }
+      }
+    });
+
+    const box = new THREE.Box3().setFromObject(model);
+    const center = box.getCenter(new THREE.Vector3());
+    const size = box.getSize(new THREE.Vector3());
+
+    // Modeli merkezle
+    model.position.sub(center);
+
+    const wrapper = new THREE.Group();
+    wrapper.add(model);
+
+    // Otomatik ölçekleme (Maksimum boyutu 3.2 birime normalize et)
+    const maxDim = Math.max(size.x, size.y, size.z);
+    let scale = 1;
+    if (maxDim > 0) {
+      scale = 3.2 / maxDim;
+      wrapper.scale.set(scale, scale, scale);
+    }
+    const scaledSize = size.clone().multiplyScalar(scale);
+
+    // Hitbox ve Fizik Gövdesi
+    const half = new CANNON.Vec3(
+      Math.max(scaledSize.x / 2, 0.4),
+      Math.max(scaledSize.y / 2, 0.4),
+      Math.max(scaledSize.z / 2, 0.4)
+    );
+
+    const body = new CANNON.Body({
+      mass: 8,
+      shape: new CANNON.Box(half),
+      material: physMat,
+      linearDamping: 0.6,
+      angularDamping: 0.85
+    });
+
+    const spawnX = (Math.random() - 0.5) * 6;
+    const spawnZ = (Math.random() - 0.5) * 4;
+    body.position.set(spawnX, 12, spawnZ);
+    world.addBody(body);
+    scene.add(wrapper);
+
+    // Tel kafes (Hitbox) görseli
+    const hitboxGeo = new THREE.BoxGeometry(half.x * 2, half.y * 2, half.z * 2);
+    const hitboxMat = new THREE.MeshBasicMaterial({ color: 0x00f0ff, wireframe: true, transparent: true, opacity: 0.7 });
+    const hitboxMesh = new THREE.Mesh(hitboxGeo, hitboxMat);
+    hitboxMesh.visible = debugMode;
+    wrapper.add(hitboxMesh);
+
+    cubes.push({
+      object: wrapper,
+      body: body,
+      hitbox: hitboxMesh,
+      size: half,
+      isCustomModel: true,
+      name: name
+    });
+
+    const badge = document.getElementById('hud-status-badge');
+    if (badge) {
+      badge.textContent = "MODEL EKLENDİ";
+      badge.className = 'status-badge status-held';
+      setTimeout(() => {
+        if (badge) {
+          badge.textContent = activeConstraint ? t.locked : t.free;
+          badge.className = activeConstraint ? 'status-badge status-held' : 'status-badge status-free';
+        }
+      }, 2000);
+    }
+  }
+
+  // --- FARE VE DOKUNMA ETKİLEŞİMİ (KOL TUTUŞU + DOĞRUDAN TAŞIMA) ---
+  let directDragged = null;
+  const dragPlane = new THREE.Plane();
+  const dragIntersect = new THREE.Vector3();
+
+  window.addEventListener('pointerdown', (e) => {
+    if (e.target.closest('#settings-panel') || e.target.closest('.upload-btn') || e.target.closest('.panel-hint') || e.target.closest('#cam-container')) return;
+
+    // Sağ tık veya Shift+Tık ile nesneleri doğrudan 3D uzayda taşıma
+    const pointer = new THREE.Vector2(
+      (e.clientX / window.innerWidth) * 2 - 1,
+      -(e.clientY / window.innerHeight) * 2 + 1
+    );
+    raycaster.setFromCamera(pointer, camera);
+
+    const meshes = [];
+    cubes.forEach(c => {
+      c.object.traverse(child => { if (child.isMesh && child !== c.hitbox) meshes.push(child); });
+    });
+    const intersects = raycaster.intersectObjects(meshes, true);
+
+    if (intersects.length > 0 && (e.button === 2 || e.shiftKey)) {
+      const hitMesh = intersects[0].object;
+      const entry = cubes.find(c => {
+        let found = false;
+        c.object.traverse(child => { if (child === hitMesh) found = true; });
+        return found;
+      });
+      if (entry) {
+        directDragged = entry;
+        const camDir = camera.getWorldDirection(new THREE.Vector3()).negate();
+        dragPlane.setFromNormalAndCoplanarPoint(camDir, entry.object.position);
+        e.preventDefault();
+        return;
+      }
+    }
+
+    if (e.button === 0 && !isHandTracking) triggerSqueeze(true);
+  });
+
+  window.addEventListener('pointermove', (e) => {
+    if (directDragged) {
+      const pointer = new THREE.Vector2(
+        (e.clientX / window.innerWidth) * 2 - 1,
+        -(e.clientY / window.innerHeight) * 2 + 1
+      );
+      raycaster.setFromCamera(pointer, camera);
+      if (raycaster.ray.intersectPlane(dragPlane, dragIntersect)) {
+        directDragged.body.position.copy(dragIntersect);
+        directDragged.body.velocity.set(0, 0, 0);
+        directDragged.body.angularVelocity.set(0, 0, 0);
+      }
+      return;
+    }
+
+    if (isHandTracking) return;
+    targetMouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+    targetMouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+  });
+
+  window.addEventListener('pointerup', (e) => {
+    if (directDragged) {
+      directDragged = null;
+    }
+    if (e.button === 0 && !isHandTracking) triggerSqueeze(false);
+  });
+
+  window.addEventListener('contextmenu', (e) => {
+    if (directDragged) e.preventDefault();
+  });
 
   // --- KONTROL PANELİ VE MEDIAPIPE YÖNETİMİ ---
-  const videoElement = document.getElementById('input_video'); const canvasElement = document.getElementById('output_canvas'); const canvasCtx = canvasElement.getContext('2d');
-  const hudHand = document.getElementById('hud-hand'); const hudCamView = document.getElementById('hud-cam-view');
+  const videoElement = document.getElementById('input_video'); 
+  const canvasElement = document.getElementById('output_canvas'); 
+  const canvasCtx = canvasElement.getContext('2d');
+  const hudHand = document.getElementById('hud-hand'); 
+  const hudCamView = document.getElementById('hud-cam-view');
 
-  let mCamera = null; let hands = null;
+  let mCamera = null; 
+  let hands = null;
 
   function togglePanel() {
-      isPanelOpen = !isPanelOpen; panelDiv.style.display = isPanelOpen ? 'block' : 'none'; document.getElementById('hint-btn').style.display = isPanelOpen ? 'none' : 'block';
+      isPanelOpen = !isPanelOpen; 
+      panelDiv.style.display = isPanelOpen ? 'block' : 'none'; 
+      document.getElementById('hint-btn').style.display = isPanelOpen ? 'none' : 'block';
   }
-  document.getElementById('hint-btn').addEventListener('click', togglePanel); togglePanel(); 
+  document.getElementById('hint-btn').addEventListener('click', togglePanel); 
+  togglePanel(); 
 
-  // Grafik Ayarları Yönetimi
-  selGraphics.addEventListener('change', (e) => {
-      const mode = e.target.value;
+  // Grafik Ayarları Yönetimi (Masaüstünde Otomatik Orta, Telefonlarda Düşük)
+  function applyGraphicsQuality(mode) {
+      selGraphics.value = mode;
       if (mode === 'low') {
           renderer.shadowMap.enabled = false;
-          renderer.setPixelRatio(0.6); // Pixel yoğunluğunu aşırı düşür (GPU dostu)
+          renderer.setPixelRatio(0.65); // GPU dostu
           mainLight.castShadow = false;
       } else if (mode === 'med') {
           renderer.shadowMap.enabled = true;
@@ -443,8 +771,16 @@
           mainLight.shadow.mapSize.width = 2048;
           mainLight.shadow.mapSize.height = 2048;
       }
-      mainLight.shadow.map = null; // Eski haritayı sıfırla ki çözünürlük değişsin
-      scene.traverse((child) => { if (child.isMesh) child.material.needsUpdate = true; }); // Şeyderları yenile
+      if (mainLight.shadow.map) mainLight.shadow.map = null;
+      scene.traverse((child) => { if (child.isMesh && child.material) child.material.needsUpdate = true; });
+  }
+
+  // Otomatik Kalite Belirleme: Telefonlarda Düşük, Masaüstünde Orta
+  const isPhone = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || window.innerWidth <= 768;
+  applyGraphicsQuality(isPhone ? 'low' : 'med');
+
+  selGraphics.addEventListener('change', (e) => {
+      applyGraphicsQuality(e.target.value);
   });
 
   function syncPanelUI() {
@@ -548,9 +884,10 @@
       cube.object.position.copy(cube.body.position);
       cube.object.quaternion.copy(cube.body.quaternion);
 
-      if (debugMode) {
+      if (debugMode && cube.hitbox && cube.hitbox.material) {
           const dist = tipWorldPos.distanceTo(cube.object.position);
-          cube.hitbox.material.color.setHex((dist < TARGET_SIZE * 1.5) ? 0x00ff00 : 0x00f0ff);
+          const reach = cube.size ? Math.max(cube.size.x, cube.size.y, cube.size.z) * 2 : TARGET_SIZE * 1.5;
+          cube.hitbox.material.color.setHex((dist < reach) ? 0x00ff00 : 0x00f0ff);
       }
     });
 

@@ -181,6 +181,13 @@
       pointer-events: none;
     }
     
+    .cd-img {
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      object-fit: contain;
+    }
+    
     .floppy-label {
       position: absolute;
       top: 35%;
@@ -297,6 +304,12 @@
         height: auto !important;
       }
 
+
+      body.dark-mode #splash-screen {
+        background: url('/assets/dark-sky.jpg') no-repeat center center !important;
+        background-size: cover !important;
+      }
+
       body.dark-mode .top-right-controls {
         background: rgba(18, 18, 18, 0.8);
         box-shadow: 0 5px 20px rgba(0,0,0,0.5);
@@ -310,6 +323,14 @@
       h1 {
         font-size: 2rem !important;
         letter-spacing: 1px !important;
+      }
+      
+      body {
+        padding-right: 36px;
+      }
+      
+      .retro-scrollbar {
+        display: flex !important;
       }
       
       p.subtitle {
@@ -333,25 +354,148 @@
         margin: 0 auto;
       }
     }
+
+    /* Split Glitch Theme */
+    body.split-theme {
+      background: linear-gradient(135deg, #0a0a0a 50%, #f0f0f0 50%) !important;
+      color: #00ff66 !important;
+    }
+    body.split-theme h1 {
+      color: #ff0055 !important;
+      text-shadow: 3px 3px 0px #000, -3px -3px 0px #fff !important;
+    }
+    body.split-theme #t-subtitle {
+      background: #000;
+      color: #00ffcc !important;
+      display: inline-block;
+      padding: 4px 10px;
+      border: 1px dashed #00ffcc;
+    }
+    body.split-theme #t-legend {
+      background: #fff;
+      color: #ff0055 !important;
+      display: inline-block;
+      padding: 4px 10px;
+      border: 1px dashed #ff0055;
+    }
+    body.split-theme .archive-box {
+      background-color: #121212 !important;
+      border-color: #ff0055 !important;
+      border-bottom-color: #00ffff !important;
+      border-right-color: #00ffff !important;
+      box-shadow: 0 0 25px rgba(255, 0, 85, 0.4), inset 0 0 15px rgba(0, 255, 255, 0.3) !important;
+    }
+    body.split-theme .archive-label {
+      background: #ffffff !important;
+      color: #000000 !important;
+      border-color: #ff0055 !important;
+    }
+    body.split-theme .top-right-controls {
+      background: rgba(0, 0, 0, 0.85) !important;
+      border: 2px dashed #00ffcc !important;
+    }
+
+    /* Retro Mobile Scrollbar */
+    .retro-scrollbar {
+      display: none;
+      position: fixed;
+      right: 0;
+      top: 0;
+      width: 32px;
+      height: 100%;
+      background: #dfdfdf;
+      border-left: 2px solid #808080;
+      z-index: 9999;
+      flex-direction: column;
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .sb-arrow {
+      height: 32px;
+      width: 100%;
+      background: #c0c0c0;
+      border: 2px outset #ffffff;
+      border-right-color: #000;
+      border-bottom-color: #000;
+      font-size: 13px;
+      line-height: 28px;
+      text-align: center;
+      cursor: pointer;
+      padding: 0;
+      color: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .sb-arrow:active {
+      border: 2px inset #ffffff;
+      border-top-color: #000;
+      border-left-color: #000;
+    }
+    .sb-track {
+      flex: 1;
+      position: relative;
+      background: repeating-conic-gradient(#c0c0c0 0% 25%, #ffffff 0% 50%) 50% / 4px 4px;
+      cursor: pointer;
+      touch-action: none;
+    }
+    .sb-thumb {
+      position: absolute;
+      left: 0;
+      width: 100%;
+      height: 48px;
+      background: #c0c0c0;
+      border: 2px outset #ffffff;
+      border-right-color: #000;
+      border-bottom-color: #000;
+      cursor: grab;
+      box-sizing: border-box;
+      touch-action: none;
+    }
+    .sb-thumb:active {
+      cursor: grabbing;
+      border: 2px inset #ffffff;
+      border-top-color: #000;
+      border-left-color: #000;
+    }
   </style>
 </head>
 <body>
 
   <!-- Fake Loading Screens -->
-  <div id="boot-screen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; color: #fff; font-family: 'VT323', monospace; z-index: 10000; display: flex; flex-direction: column; justify-content: flex-start; padding: 20px; box-sizing: border-box; font-size: 24px;">
-    <div id="boot-text"></div>
+  <div id="boot-screen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; color: #fff; z-index: 10000; display: flex; flex-direction: column; justify-content: center; align-items: center; box-sizing: border-box;">
+    <style>
+      @keyframes spinFast { 100% { transform: rotate(360deg); } }
+      .mobile-edition { display: none; font-size: 1rem; font-family: 'Press Start 2P', cursive; color: #aaa; text-align: center; margin-top: 10px; }
+      @media (max-width: 768px) { .mobile-edition { display: block; } }
+    </style>
+    <img src="/assets/aligaliphub.png" style="width: 120px; height: 120px; animation: spinFast 1.5s linear infinite; margin-bottom: 20px;">
+    <div style="font-family: 'Black Ops One', cursive; font-size: 3rem; color: #fff; display: flex; flex-direction: column; align-items: center;">
+        AliGalipHub
+        <span class="mobile-edition">Mobile Edition</span>
+    </div>
+    <div id="boot-text" style="display: none;"></div>
   </div>
 
   <div id="splash-screen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: url('/assets/clouds.jpg') no-repeat center center; background-size: cover; z-index: 9999; display: none; align-items: center; justify-content: center; flex-direction: column;">
-    <h1 style="font-family: 'Black Ops One', cursive; font-size: 6rem; color: #000; text-shadow: 2px 2px 0px #fff, -2px -2px 0px #fff, 2px -2px 0px #fff, -2px 2px 0px #fff; margin: 0; letter-spacing: 4px; text-align: center;">AGHub</h1>
+    <img src="/assets/aligaliphub.png" alt="AGHub Icon" style="width: 384px; height: 384px; image-rendering: pixelated; filter: drop-shadow(4px 4px 0px #fff); margin-bottom: 20px;">
+    <h1 style="font-family: 'Black Ops One', cursive; font-size: 5rem; color: #000; text-shadow: 2px 2px 0px #fff, -2px -2px 0px #fff, 2px -2px 0px #fff, -2px 2px 0px #fff; margin: 0; letter-spacing: 4px; text-align: center;">AliGalipHub</h1>
   </div>
   
   <div id="site-wrapper" style="display: none;">
-
-
+    <!-- Retro Win98 Mobile Scrollbar -->
+    <div id="retro-scrollbar" class="retro-scrollbar">
+      <button class="sb-arrow" id="sb-up" aria-label="Scroll Up">▲</button>
+      <div class="sb-track" id="sb-track">
+        <div class="sb-thumb" id="sb-thumb"></div>
+      </div>
+      <button class="sb-arrow" id="sb-down" aria-label="Scroll Down">▼</button>
+    </div>
     <div class="logo" id="site-logo" style="font-family: 'Black Ops One', cursive; font-size: 30px; line-height: 50px; text-shadow: 2px 2px 0px #aaa; position: relative; display: flex; align-items: center; gap: 10px;">
     AGHub
-    <img src="/assets/aligaliphub-icon.png" alt="Icon" style="width: 40px; height: 40px;">
+    <img src="/assets/aligaliphub.png" alt="Icon" id="secret-icon" draggable="true" style="width: 40px; height: 40px; cursor: grab;" ondragstart="event.dataTransfer.setData('text/plain', 'easteregg');">
   </div>
   
   <div class="top-right-controls">
@@ -381,6 +525,7 @@
   <main class="main-content">
     <h1 style="font-family: 'Black Ops One', cursive; font-size: 4rem; letter-spacing: 2px;">AliGalipHub</h1>
     <p class="subtitle" id="t-subtitle">Ali Galip'ten bir sürü proje</p>
+    <p class="subtitle" style="font-size: 14px; margin-top: 5px;" id="t-legend">CD'ler Uygulama, Disketler Web Sitesidir</p>
     
     <div class="archive-box">
       <div class="archive-label" id="t-archive">PROJE ARŞİVİ</div>
@@ -391,7 +536,11 @@
   </main>
 
 
+  <div id="black-screen" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 100000;"></div>
+
+  <div id="t-health_warning" style="position: fixed; bottom: 20px; left: 20px; font-family: 'Pixelify Sans', sans-serif; font-size: 14px; max-width: 250px; text-align: left; z-index: 998; opacity: 0.6;">Daha Sağlıklı bir Kullanım için Bilgisayardan Girin</div>
   <select id="language-select" aria-label="Language selection" style="position: fixed; bottom: 20px; right: 20px; padding: 10px; font-family: 'Pixelify Sans', sans-serif; font-size: 16px; background: #fff; color: #000; border: 2px solid #ccc; cursor: pointer; z-index: 999; border-radius: 5px;">
+    <option value="auto">Otomatik (Auto)</option>
     <option value="en">English</option>
     <option value="zh">中文 (Mandarin)</option>
     <option value="hi">हिन्दी (Hindi)</option>
@@ -415,13 +564,17 @@
 
   <div class="feedback-section" style="margin-top: 20px; margin-bottom: 0;">
     <div style="display:flex; justify-content:center; gap: 30px;">
-      <div class="floppy-wrapper" draggable="true" id="disc-idk15052007" style="cursor: grab;">
-        <img src="/assets/discs/floppy-disc.png" class="floppy-img" alt="idk15052007 Disc" width="150" height="150">
-        <div class="floppy-label"><div class="floppy-title" style="font-size: 14px;">idk15052007.exe</div></div>
+      <div class="floppy-wrapper" draggable="true" id="disc-idk15052007" style="cursor: grab; display: none;">
+        <img src="/assets/cd/cd.png" class="cd-img" alt="gift_disc CD" width="150" height="150">
+        <div class="floppy-label" style="top: 60%; transform: none; width: 100%; left: 0;"><div class="floppy-title" style="font-size: 14px; color: #fff; text-shadow: 1px 1px 2px #000;">gift_disc.exe</div></div>
       </div>
       <div class="floppy-wrapper" draggable="true" id="disc-contact" style="cursor: grab;">
         <img src="/assets/discs/floppy-disc.png" class="floppy-img" alt="Contact Disc" width="150" height="150">
         <div class="floppy-label"><div class="floppy-title" style="font-size: 14px;">contact.exe</div></div>
+      </div>
+      <div class="floppy-wrapper" draggable="true" id="disc-plans" style="cursor: grab;">
+        <img src="/assets/discs/floppy-disc.png" class="floppy-img" alt="Plans Disc" width="150" height="150">
+        <div class="floppy-label"><div class="floppy-title" style="font-size: 14px;">???.exe</div></div>
       </div>
     </div>
   </div>
@@ -431,7 +584,7 @@
   <div id="win98-download" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #c0c0c0; border: 2px solid #000; box-shadow: 2px 2px 0px #000; width: 300px; z-index: 2000; font-family: 'Pixelify Sans', sans-serif;">
     <div style="background: #000080; color: #fff; padding: 2px 5px; font-weight: bold; font-family: 'Press Start 2P', monospace; font-size: 10px; display: flex; justify-content: space-between;">
       <span id="t-download-title">İndiriliyor...</span>
-      <span style="background: #c0c0c0; color: #000; border: 1px solid #fff; border-bottom-color: #888; border-right-color: #888; padding: 0 4px; cursor: pointer;" onclick="document.getElementById('win98-download').style.display='none';">X</span>
+      <span style="background: #c0c0c0; color: #000; border: 1px solid #fff; border-bottom-color: #888; border-right-color: #888; padding: 0 4px; cursor: pointer;" onclick="cancelDownload()">X</span>
     </div>
     <div style="padding: 15px;">
       <div id="download-preview" style="display: none; width: 100%; height: 100px; margin-bottom: 10px; border: 2px inset #fff; border-top-color: #888; border-left-color: #888; overflow: hidden; background: #000;">
@@ -455,7 +608,8 @@
           </div>
        </div>
     </div>
-    <iframe id="app-iframe" src="about:blank" allow="autoplay; fullscreen"></iframe>
+    <iframe id="app-iframe" src="about:blank" allow="camera; fullscreen"></iframe>
+    <div id="project-download-link" style="position: absolute; left: 10px; bottom: 10px; z-index: 10001; mix-blend-mode: difference; color: #fff; font-family: 'Pixelify Sans', sans-serif; font-size: 14px; pointer-events: auto; display: none;"></div>
     <video id="app-video" src="/assets/video/rickroll.mp4" style="display: none; width: 100%; height: 100%; object-fit: contain; background: #000;" loop></video>
   </div>
 
@@ -475,47 +629,37 @@
     // Prevent scrolling during boot
     document.body.style.overflow = 'hidden';
 
-    const bootMessages = [
-        "Starting MS-DOS...",
-        "HIMEM is testing extended memory...done.",
-        "Loading ALIGALIP_HUB.SYS...",
-        "Initializing BIOS...",
-        "Booting Windows 98..."
-    ];
-    
-    let bootMsgIndex = 0;
+    let loadPercent = 0;
     const bootInterval = setInterval(() => {
-        if(bootMsgIndex < bootMessages.length) {
-            bootText.innerHTML += bootMessages[bootMsgIndex] + "<br>";
-            bootMsgIndex++;
+        loadPercent += Math.floor(Math.random() * 15) + 5;
+        if (loadPercent >= 90) {
+            loadPercent = 90;
+            bootText.innerText = "%" + loadPercent + " Yükleniyor...";
+            clearInterval(bootInterval);
+            setTimeout(() => {
+                bootScreen.style.display = 'none';
+                if(splashScreen) splashScreen.style.display = 'none';
+                siteWrapper.style.display = 'block';
+                document.body.style.overflow = '';
+            }, 200);
+        } else {
+            bootText.innerText = "%" + loadPercent + " Yükleniyor...";
         }
-    }, 180);
-
-    setTimeout(() => {
-        clearInterval(bootInterval);
-        bootScreen.style.display = 'none';
-        splashScreen.style.display = 'flex';
-        
-        setTimeout(() => {
-            splashScreen.style.display = 'none';
-            siteWrapper.style.display = 'block';
-            document.body.style.overflow = '';
-        }, 4000);
-    }, 2500);
+    }, 150);
     // -----------------------------
 
     // Projects Data (Dummy)
 
     let projects = [
-      { id: 'awebsitespace', title: 'A WebSite Space', url: 'https://www.awebsite.space', isDownload: true },
-      { id: 'haberci', title: 'AGRSS', url: 'https://github.com/aligaliptugcu/aligaliphub/releases/download/v1.0/Haberci.zip', isDownload: true },
-      { id: 'nottasks', title: 'NotTasks', url: 'https://github.com/aligaliptugcu/aligaliphub/releases/download/v1.0/NotTasks.zip', isDownload: true },
-      { id: 'storageviewer', title: 'Storage Viewer', url: 'https://github.com/aligaliptugcu/aligaliphub/releases/download/v1.0/StorageViewer.zip', isDownload: true },
-      { id: 'turnit', title: 'TurnIt', url: 'https://github.com/aligaliptugcu/aligaliphub/releases/download/v1.0/TurnIt.zip', isDownload: true },
-      { id: 'retroclock', title: 'Retro Clock', url: '/retro-clock', isDownload: true },
-            { id: '3darm', title: '3Darm', url: '/3darm', isDownload: true },
-      { id: 'patpatizator', title: 'PatPatizator', url: 'https://github.com/aligaliptugcu/aligaliphub/releases/download/v1.0/PatPatizator.zip', isDownload: true },
-      { id: 'glatris', title: 'GLatris', url: '/glatris.html', isDownload: false }
+      { id: 'awebsitespace', title: 'A WebSite Space', url: 'https://www.awebsite.space', isDownload: true, type: 'floppy' },
+      { id: 'haberci', title: 'AGRSS', url: 'https://github.com/aligaliptugcu/aligaliphub/releases/download/v1.0/Haberci.AppImage', isDownload: true, type: 'cd' },
+      { id: 'nottasks', title: 'NotTasks', url: 'https://github.com/aligaliptugcu/aligaliphub/releases/download/v1.0/NotTasks.AppImage', isDownload: true, type: 'cd' },
+      { id: 'storageviewer', title: 'Storage Viewer', url: 'https://github.com/aligaliptugcu/aligaliphub/releases/download/v1.0/StorageViewer.AppImage', isDownload: true, type: 'cd' },
+      { id: 'turnit', title: 'TurnIt', url: 'https://github.com/aligaliptugcu/aligaliphub/releases/download/v1.0/TurnIt.AppImage', isDownload: true, type: 'cd' },
+      { id: 'retroclock', title: 'Retro Clock', url: '/retro-clock', isDownload: true, type: 'floppy' },
+      { id: '3darm', title: 'The Amazing Digital 3D World', url: '/3darm?v=3', isDownload: false, type: 'floppy' },
+      { id: 'patpatizator', title: 'PatPatizator', url: 'https://github.com/aligaliptugcu/aligaliphub/releases/download/v1.0/PatPatizator.AppImage', isDownload: true, type: 'cd' },
+      { id: 'glatris', title: 'GLatris', url: '/glatris.html', isDownload: false, type: 'floppy' }
     ];
     try {
       const cp = JSON.parse(localStorage.getItem('custom_projects') || '[]');
@@ -536,27 +680,28 @@
     let isBroken = false;
 
     const translations = {
-      en: { subtitle: "A Floppy Disc collection created by Ali Galip", archive: "PROJECT ARCHIVE", eject: "[ EJECT DISC ]", broken: "Oops, disc is broken, refresh the page", alpha: "Alpha Version", fbtitle: "Feedback", fbdesc: "Insert disc into Write drive, save, then insert to Send drive.", write: "Write", send: "Send", cat: "Category:", msg: "Message:", save: "SAVE & EJECT", dl_title: "Downloading...", dl_text: "Please wait, downloading file...", empty_disc: "EMPTY DISC", full_disc: "FULL DISC", status_sending: "Sending...", status_sent: "Process Complete" },
-      tr: { subtitle: "Ali Galip'ten bir sürü proje", archive: "PROJE ARŞİVİ", eject: "[ DİSKETİ ÇIKAR ]", broken: "Eyvah, disk bozuldu, düzeltmek için sayfayı yenileyin", alpha: "Alpha Sürümü", fbtitle: "Geri Bildirim", fbdesc: "Diski 'Üzerine Yaz' sürücüsüne takıp kaydedin, ardından 'Gönder' sürücüsüyle iletin.", write: "Üzerine Yaz", send: "Gönder", cat: "Kategori:", msg: "Mesaj:", save: "KAYDET & ÇIKAR", dl_title: "İndiriliyor...", dl_text: "Lütfen bekleyin, dosya indiriliyor...", empty_disc: "BOS DISK", full_disc: "DOLU DISK", status_sending: "İletiliyor...", status_sent: "İşlem Tamamlandı" },
-      zh: { subtitle: "Ali Galip的许多项目", archive: "项目档案", eject: "[ 弹出磁盘 ]", broken: "哎呀，磁盘损坏了，请刷新页面", alpha: "Alpha版本", fbtitle: "反馈", fbdesc: "将磁盘插入写入驱动器，保存，然后插入发送驱动器。", write: "写入", send: "发送", cat: "类别：", msg: "消息：", save: "保存并弹出", dl_title: "下载中...", dl_text: "请稍候，文件正在下载...", empty_disc: "空磁盘", full_disc: "全盘", status_sending: "发送中...", status_sent: "处理完成" },
-      hi: { subtitle: "अली गालिप से कई प्रोजेक्ट", archive: "परियोजना संग्रह", eject: "[ डिस्क निकालें ]", broken: "उफ़, डिस्क टूट गई है, पृष्ठ को रीफ्रेश करें", alpha: "अल्फा संस्करण", fbtitle: "प्रतिक्रिया", fbdesc: "लिखें ड्राइव में डिस्क डालें, सहेजें, फिर भेजें ड्राइव में डालें।", write: "लिखें", send: "भेजें", cat: "श्रेणी:", msg: "संदेश:", save: "सहेजें और निकालें", dl_title: "डाउनलोड हो रहा है...", dl_text: "कृपया प्रतीक्षा करें, फ़ाइल डाउनलोड हो रही है...", empty_disc: "खाली डिस्क", full_disc: "पूर्ण डिस्क", status_sending: "भेजा जा रहा है...", status_sent: "प्रक्रिया पूरी हुई" },
-      es: { subtitle: "Muchos proyectos de Ali Galip", archive: "ARCHIVO DE PROYECTOS", eject: "[ EXPULSAR ]", broken: "Vaya, el disco está roto, actualiza la página", alpha: "Versión Alfa", fbtitle: "Comentarios", fbdesc: "Inserte el disco en la unidad Escribir, guarde, luego inserte en Enviar.", write: "Escribir", send: "Enviar", cat: "Categoría:", msg: "Mensaje:", save: "GUARDAR Y EXPULSAR", dl_title: "Descargando...", dl_text: "Por favor espere, descargando...", empty_disc: "DISCO VACÍO", full_disc: "DISCO LLENO", status_sending: "Enviando...", status_sent: "Proceso Completo" },
-      fr: { subtitle: "Beaucoup de projets d'Ali Galip", archive: "ARCHIVE DE PROJETS", eject: "[ ÉJECTER ]", broken: "Oups, le disque est cassé, actualisez", alpha: "Version Alpha", fbtitle: "Commentaires", fbdesc: "Insérez le disque dans Écrire, enregistrez, puis Envoyer.", write: "Écrire", send: "Envoyer", cat: "Catégorie:", msg: "Message:", save: "ENREGISTRER ET ÉJECTER", dl_title: "Téléchargement...", dl_text: "Veuillez patienter...", empty_disc: "DISQUE VIDE", full_disc: "DISQUE PLEIN", status_sending: "Envoi...", status_sent: "Terminé" },
-      ar: { subtitle: "الكثير من المشاريع من علي غالب", archive: "أرشيف المشاريع", eject: "[ إخراج ]", broken: "عفوًا ، القرص مكسور", alpha: "نسخة ألفا", fbtitle: "تعليقات", fbdesc: "أدخل القرص في محرك الكتابة، احفظ، ثم أرسل.", write: "كتابة", send: "إرسال", cat: "فئة:", msg: "رسالة:", save: "حفظ وإخراج", dl_title: "جار التحميل...", dl_text: "الرجاء الانتظار...", empty_disc: "قرص فارغ", full_disc: "قرص ممتلئ", status_sending: "إرسال...", status_sent: "اكتملت العملية" },
-      bn: { subtitle: "আলী গালিপ থেকে অনেক প্রকল্প", archive: "প্রকল্প সংরক্ষণাগার", eject: "[ ডিস্ক বের করুন ]", broken: "ওপস, ডিস্কটি ভেঙে গেছে", alpha: "আলফা সংস্করণ", fbtitle: "প্রতিক্রিয়া", fbdesc: "লিখুন ড্রাইভে ডিস্ক প্রবেশ করান, সংরক্ষণ করুন, তারপর পাঠান।", write: "লিখুন", send: "পাঠান", cat: "বিভাগ:", msg: "বার্তা:", save: "সংরক্ষণ করুন", dl_title: "ডাউনলোড হচ্ছে...", dl_text: "অনুগ্রহ করে অপেক্ষা করুন...", empty_disc: "খালি ডিস্ক", full_disc: "পূর্ণ ডিস্ক", status_sending: "পাঠানো হচ্ছে...", status_sent: "প্রক্রিয়া সম্পন্ন" },
-      ru: { subtitle: "Много проектов от Али Галипа", archive: "АРХИВ ПРОЕКТОВ", eject: "[ ИЗВЛЕЧЬ ]", broken: "Ой, диск сломан, обновите", alpha: "Альфа-версия", fbtitle: "Отзывы", fbdesc: "Вставьте диск в привод записи, сохраните, затем в отправку.", write: "Запись", send: "Отправка", cat: "Категория:", msg: "Сообщение:", save: "СОХРАНИТЬ", dl_title: "Загрузка...", dl_text: "Пожалуйста, подождите, загрузка...", empty_disc: "ПУСТОЙ ДИСК", full_disc: "ПОЛНЫЙ ДИСК", status_sending: "Отправка...", status_sent: "Процесс завершен" },
-      pt: { subtitle: "Muitos projetos de Ali Galip", archive: "ARQUIVO DE PROJETOS", eject: "[ EJETAR ]", broken: "Ops, o disco está quebrado", alpha: "Versão Alfa", fbtitle: "Comentários", fbdesc: "Insira o disco na unidade Gravar, salve e Enviar.", write: "Gravar", send: "Enviar", cat: "Categoria:", msg: "Mensagem:", save: "SALVAR E EJETAR", dl_title: "Baixando...", dl_text: "Por favor, aguarde...", empty_disc: "DISCO VAZIO", full_disc: "DISCO CHEIO", status_sending: "Enviando...", status_sent: "Processo Concluído" },
-      ur: { subtitle: "علی غالب کے بہت سے منصوبے", archive: "پروجیکٹ آرکائیو", eject: "[ نکالیں ]", broken: "افوہ، ڈسک ٹوٹ گئی ہے", alpha: "الفا ورژن", fbtitle: "رائے", fbdesc: "رائٹ ڈرائیو میں ڈسک ڈالیں، محفوظ کریں، پھر بھیجیں۔", write: "لکھیں", send: "بھیجیں", cat: "زمرہ:", msg: "پیغام:", save: "محفوظ کریں", dl_title: "ڈاؤن لوڈ ہو رہا ہے...", dl_text: "براہ کرم انتظار کریں...", empty_disc: "خالی ڈسک", full_disc: "بھری ہوئی ڈسک", status_sending: "بھیجا جا رہا ہے...", status_sent: "عمل مکمل" },
-      id: { subtitle: "Banyak proyek dari Ali Galip", archive: "ARSIP PROYEK", eject: "[ KELUARKAN ]", broken: "Ups, disknya rusak, segarkan", alpha: "Versi Alfa", fbtitle: "Umpan Balik", fbdesc: "Masukkan disk ke drive Tulis, simpan, lalu Kirim.", write: "Tulis", send: "Kirim", cat: "Kategori:", msg: "Pesan:", save: "SIMPAN & KELUARKAN", dl_title: "Mengunduh...", dl_text: "Harap tunggu, mengunduh file...", empty_disc: "DISK KOSONG", full_disc: "DISK PENUH", status_sending: "Mengirim...", status_sent: "Proses Selesai" },
-      de: { subtitle: "Viele Projekte von Ali Galip", archive: "PROJEKTARCHIV", eject: "[ AUSWERFEN ]", broken: "Hoppla, die Diskette ist kaputt", alpha: "Alpha-Version", fbtitle: "Feedback", fbdesc: "Diskette in Schreiblaufwerk einlegen, speichern, dann Senden.", write: "Schreiben", send: "Senden", cat: "Kategorie:", msg: "Nachricht:", save: "SPEICHERN & AUSWERFEN", dl_title: "Wird heruntergeladen...", dl_text: "Bitte warten...", empty_disc: "LEERE DISKETTE", full_disc: "VOLLE DISKETTE", status_sending: "Wird gesendet...", status_sent: "Vorgang abgeschlossen" },
-      ja: { subtitle: "アリ・ガリップの多くのプロジェクト", archive: "プロジェクトアーカイブ", eject: "[ 取り出し ]", broken: "おっと、ディスクが壊れました", alpha: "アルファ版", fbtitle: "フィードバック", fbdesc: "書き込みドライブに挿入、保存、送信に挿入。", write: "書き込み", send: "送信", cat: "カテゴリー:", msg: "メッセージ:", save: "保存して取り出し", dl_title: "ダウンロード中...", dl_text: "お待ちください...", empty_disc: "空のディスク", full_disc: "フルディスク", status_sending: "送信中...", status_sent: "処理完了" },
-      mr: { subtitle: "अली गालिप कडून बरेच प्रकल्प", archive: "प्रकल्प संग्रह", eject: "[ बाहेर काढा ]", broken: "अरेरे, डिस्क तुटली आहे", alpha: "अल्फा आवृत्ती", fbtitle: "अभिप्राय", fbdesc: "लिहा ड्राइव्हमध्ये डिस्क घाला, सेव्ह करा, नंतर पाठवा.", write: "लिहा", send: "पाठवा", cat: "श्रेणी:", msg: "संदेश:", save: "सेव्ह करा", dl_title: "डाउनलोड होत आहे...", dl_text: "कृपया प्रतीक्षा करा...", empty_disc: "रिकामी डिस्क", full_disc: "पूर्ण डिस्क", status_sending: "पाठवत आहे...", status_sent: "प्रक्रिया पूर्ण झाली" }
+      en: { legend: "CDs are Apps, Floppy Disks are Websites",  subtitle: "A floppy disc collection created by Ali Galip", health_warning: "For a healthier experience, please access via computer", archive: "PROJECT ARCHIVE", eject: "[ EJECT DISC ]", broken: "Oops, disc is broken, refresh the page", alpha: "Alpha Version", fbtitle: "Feedback", fbdesc: "Insert disc into Write drive, save, then insert to Send drive.", write: "Write", send: "Send", cat: "Category:", msg: "Message:", save: "SAVE & EJECT", dl_title: "Downloading...", dl_text: "Please wait, downloading file...", empty_disc: "EMPTY DISC", full_disc: "FULL DISC", status_sending: "Sending...", status_sent: "Process Complete" },
+      tr: { legend: "CD'ler Uygulama, Disketler Web Sitesidir",  subtitle: "Ali Galip tarafından oluşturulmuş bir disket koleksiyonu", health_warning: "Daha Sağlıklı bir Kullanım için Bilgisayardan Girin", archive: "PROJE ARŞİVİ", eject: "[ DİSKETİ ÇIKAR ]", broken: "Eyvah, disk bozuldu, düzeltmek için sayfayı yenileyin", alpha: "Alpha Sürümü", fbtitle: "Geri Bildirim", fbdesc: "Diski 'Üzerine Yaz' sürücüsüne takıp kaydedin, ardından 'Gönder' sürücüsüyle iletin.", write: "Üzerine Yaz", send: "Gönder", cat: "Kategori:", msg: "Mesaj:", save: "KAYDET & ÇIKAR", dl_title: "İndiriliyor...", dl_text: "Lütfen bekleyin, dosya indiriliyor...", empty_disc: "BOS DISK", full_disc: "DOLU DISK", status_sending: "İletiliyor...", status_sent: "İşlem Tamamlandı" },
+      zh: { legend: "CD是应用程序，软盘是网站",  subtitle: "由 Ali Galip 创建的软盘收藏", health_warning: "为了获得更健康的体验，请通过电脑访问", archive: "项目档案", eject: "[ 弹出磁盘 ]", broken: "哎呀，磁盘损坏了，请刷新页面", alpha: "Alpha版本", fbtitle: "反馈", fbdesc: "将磁盘插入写入驱动器，保存，然后插入发送驱动器。", write: "写入", send: "发送", cat: "类别：", msg: "消息：", save: "保存并弹出", dl_title: "下载中...", dl_text: "请稍候，文件正在下载...", empty_disc: "空磁盘", full_disc: "全盘", status_sending: "发送中...", status_sent: "处理完成" },
+      hi: { legend: "CDs ऐप्स हैं, फ़्लॉपी डिस्क वेबसाइट हैं",  subtitle: "अली गालिप द्वारा बनाया गया एक फ्लॉपी डिस्क संग्रह", health_warning: "अधिक स्वस्थ अनुभव के लिए, कृपया कंप्यूटर से एक्सेस करें", archive: "परियोजना संग्रह", eject: "[ डिस्क निकालें ]", broken: "उफ़, डिस्क टूट गई है, पृष्ठ को रीफ्रेश करें", alpha: "अल्फा संस्करण", fbtitle: "प्रतिक्रिया", fbdesc: "लिखें ड्राइव में डिस्क डालें, सहेजें, फिर भेजें ड्राइव में डालें।", write: "लिखें", send: "भेजें", cat: "श्रेणी:", msg: "संदेश:", save: "सहेजें और निकालें", dl_title: "डाउनलोड हो रहा है...", dl_text: "कृपया प्रतीक्षा करें, फ़ाइल डाउनलोड हो रही है...", empty_disc: "खाली डिस्क", full_disc: "पूर्ण डिस्क", status_sending: "भेजा जा रहा है...", status_sent: "प्रक्रिया पूरी हुई" },
+      es: { legend: "Los CD son aplicaciones, los disquetes son sitios web",  subtitle: "Una colección de disquetes creada por Ali Galip", health_warning: "Para una experiencia más saludable, acceda desde una computadora", archive: "ARCHIVO DE PROYECTOS", eject: "[ EXPULSAR ]", broken: "Vaya, el disco está roto, actualiza la página", alpha: "Versión Alfa", fbtitle: "Comentarios", fbdesc: "Inserte el disco en la unidad Escribir, guarde, luego inserte en Enviar.", write: "Escribir", send: "Enviar", cat: "Categoría:", msg: "Mensaje:", save: "GUARDAR Y EXPULSAR", dl_title: "Descargando...", dl_text: "Por favor espere, descargando...", empty_disc: "DISCO VACÍO", full_disc: "DISCO LLENO", status_sending: "Enviando...", status_sent: "Proceso Completo" },
+      fr: { legend: "Les CD sont des applications, les disquettes sont des sites Web",  subtitle: "Une collection de disquettes créée par Ali Galip", health_warning: "Pour une expérience plus saine, veuillez y accéder via un ordinateur", archive: "ARCHIVE DE PROJETS", eject: "[ ÉJECTER ]", broken: "Oups, le disque est cassé, actualisez", alpha: "Version Alpha", fbtitle: "Commentaires", fbdesc: "Insérez le disque dans Écrire, enregistrez, puis Envoyer.", write: "Écrire", send: "Envoyer", cat: "Catégorie:", msg: "Message:", save: "ENREGISTRER ET ÉJECTER", dl_title: "Téléchargement...", dl_text: "Veuillez patienter...", empty_disc: "DISQUE VIDE", full_disc: "DISQUE PLEIN", status_sending: "Envoi...", status_sent: "Terminé" },
+      ar: { legend: "الأقراص المدمجة تطبيقات، والأقراص المرنة مواقع ويب",  subtitle: "مجموعة أقراص مرنة أنشأها علي غالب", health_warning: "لتجربة صحية أفضل، يرجى الدخول من جهاز الكمبيوتر", archive: "أرشيف المشاريع", eject: "[ إخراج ]", broken: "عفوًا ، القرص مكسور", alpha: "نسخة ألفا", fbtitle: "تعليقات", fbdesc: "أدخل القرص في محرك الكتابة، احفظ، ثم أرسل.", write: "كتابة", send: "إرسال", cat: "فئة:", msg: "رسالة:", save: "حفظ وإخراج", dl_title: "جار التحميل...", dl_text: "الرجاء الانتظار...", empty_disc: "قرص فارغ", full_disc: "قرص ممتلئ", status_sending: "إرسال...", status_sent: "اكتملت العملية" },
+      bn: { legend: "সিডি হলো অ্যাপস, ফ্লপি ডিস্ক হলো ওয়েবসাইট",  subtitle: "আলী গালিপ দ্বারা তৈরি একটি ফ্লপি ডিস্ক সংগ্রহ", health_warning: "স্বাস্থ্যকর ব্যবহারের জন্য, অনুগ্রহ করে কম্পিউটার থেকে প্রবেশ করুন", archive: "প্রকল্প সংরক্ষণাগার", eject: "[ ডিস্ক বের করুন ]", broken: "ওপস, ডিস্কটি ভেঙে গেছে", alpha: "আলফা সংস্করণ", fbtitle: "প্রতিক্রিয়া", fbdesc: "লিখুন ড্রাইভে ডিস্ক প্রবেশ করান, সংরক্ষণ করুন, তারপর পাঠান।", write: "লিখুন", send: "পাঠান", cat: "বিভাগ:", msg: "বার্তা:", save: "সংরক্ষণ করুন", dl_title: "ডাউনলোড হচ্ছে...", dl_text: "অনুগ্রহ করে অপেক্ষা করুন...", empty_disc: "খালি ডিস্ক", full_disc: "পূর্ণ ডিস্ক", status_sending: "পাঠানো হচ্ছে...", status_sent: "প্রক্রিয়া সম্পন্ন" },
+      ru: { legend: "CD — это приложения, дискеты — это веб-сайты",  subtitle: "Коллекция дискет, созданная Али Галипом", health_warning: "Для более здорового использования, пожалуйста, зайдите с компьютера", archive: "АРХИВ ПРОЕКТОВ", eject: "[ ИЗВЛЕЧЬ ]", broken: "Ой, диск сломан, обновите", alpha: "Альфа-версия", fbtitle: "Отзывы", fbdesc: "Вставьте диск в привод записи, сохраните, затем в отправку.", write: "Запись", send: "Отправка", cat: "Категория:", msg: "Сообщение:", save: "СОХРАНИТЬ", dl_title: "Загрузка...", dl_text: "Пожалуйста, подождите, загрузка...", empty_disc: "ПУСТОЙ ДИСК", full_disc: "ПОЛНЫЙ ДИСК", status_sending: "Отправка...", status_sent: "Процесс завершен" },
+      pt: { legend: "CDs são aplicativos, disquetes são sites",  subtitle: "Uma coleção de disquetes criada por Ali Galip", health_warning: "Para uma experiência mais saudável, acesse pelo computador", archive: "ARQUIVO DE PROJETOS", eject: "[ EJETAR ]", broken: "Ops, o disco está quebrado", alpha: "Versão Alfa", fbtitle: "Comentários", fbdesc: "Insira o disco na unidade Gravar, salve e Enviar.", write: "Gravar", send: "Enviar", cat: "Categoria:", msg: "Mensagem:", save: "SALVAR E EJETAR", dl_title: "Baixando...", dl_text: "Por favor, aguarde...", empty_disc: "DISCO VAZIO", full_disc: "DISCO CHEIO", status_sending: "Enviando...", status_sent: "Processo Concluído" },
+      ur: { legend: "سی ڈی ایپس ہیں، فلاپی ڈسک ویب سائٹس ہیں",  subtitle: "علی غالب کا بنایا ہوا فلاپی ڈسک مجموعہ", health_warning: "بہتر تجربے کے لیے، براہ کرم کمپیوٹر سے رسائی حاصل کریں", archive: "پروجیکٹ آرکائیو", eject: "[ نکالیں ]", broken: "افوہ، ڈسک ٹوٹ گئی ہے", alpha: "الفا ورژن", fbtitle: "رائے", fbdesc: "رائٹ ڈرائیو میں ڈسک ڈالیں، محفوظ کریں، پھر بھیجیں۔", write: "لکھیں", send: "بھیجیں", cat: "زمرہ:", msg: "پیغام:", save: "محفوظ کریں", dl_title: "ڈاؤن لوڈ ہو رہا ہے...", dl_text: "براہ کرم انتظار کریں...", empty_disc: "خالی ڈسک", full_disc: "بھری ہوئی ڈسک", status_sending: "بھیجا جا رہا ہے...", status_sent: "عمل مکمل" },
+      id: { legend: "CD adalah Aplikasi, Disket adalah Situs Web",  subtitle: "Koleksi disket yang dibuat oleh Ali Galip", health_warning: "Untuk penggunaan yang lebih sehat, silakan akses melalui komputer", archive: "ARSIP PROYEK", eject: "[ KELUARKAN ]", broken: "Ups, disknya rusak, segarkan", alpha: "Versi Alfa", fbtitle: "Umpan Balik", fbdesc: "Masukkan disk ke drive Tulis, simpan, lalu Kirim.", write: "Tulis", send: "Kirim", cat: "Kategori:", msg: "Pesan:", save: "SIMPAN & KELUARKAN", dl_title: "Mengunduh...", dl_text: "Harap tunggu, mengunduh file...", empty_disc: "DISK KOSONG", full_disc: "DISK PENUH", status_sending: "Mengirim...", status_sent: "Proses Selesai" },
+      de: { legend: "CDs sind Apps, Disketten sind Websites",  subtitle: "Eine von Ali Galip erstellte Disketten-Sammlung", health_warning: "Für ein gesünderes Erlebnis greifen Sie bitte über einen Computer zu", archive: "PROJEKTARCHIV", eject: "[ AUSWERFEN ]", broken: "Hoppla, die Diskette ist kaputt", alpha: "Alpha-Version", fbtitle: "Feedback", fbdesc: "Diskette in Schreiblaufwerk einlegen, speichern, dann Senden.", write: "Schreiben", send: "Senden", cat: "Kategorie:", msg: "Nachricht:", save: "SPEICHERN & AUSWERFEN", dl_title: "Wird heruntergeladen...", dl_text: "Bitte warten...", empty_disc: "LEERE DISKETTE", full_disc: "VOLLE DISKETTE", status_sending: "Wird gesendet...", status_sent: "Vorgang abgeschlossen" },
+      ja: { legend: "CDはアプリ、フロッピーディスクはウェブサイトです",  subtitle: "Ali Galipによって作成されたフロッピーディスクコレクション", health_warning: "より健康的な使用のために、コンピュータからアクセスしてください", archive: "プロジェクトアーカイブ", eject: "[ 取り出し ]", broken: "おっと、ディスクが壊れました", alpha: "アルファ版", fbtitle: "フィードバック", fbdesc: "書き込みドライブに挿入、保存、送信に挿入。", write: "書き込み", send: "送信", cat: "カテゴリー:", msg: "メッセージ:", save: "保存して取り出し", dl_title: "ダウンロード中...", dl_text: "お待ちください...", empty_disc: "空のディスク", full_disc: "フルディスク", status_sending: "送信中...", status_sent: "処理完了" },
+      mr: { legend: "सीडी अॅप्स आहेत, फ्लॉपी डिस्क वेबसाइट आहेत",  subtitle: "अली गालिप यांनी तयार केलेला फ्लॉपी डिस्क संग्रह", health_warning: "अधिक निरोगी वापरासाठी, कृपया संगणकावरून प्रवेश करा", archive: "प्रकल्प संग्रह", eject: "[ बाहेर काढा ]", broken: "अरेरे, डिस्क तुटली आहे", alpha: "अल्फा आवृत्ती", fbtitle: "अभिप्राय", fbdesc: "लिहा ड्राइव्हमध्ये डिस्क घाला, सेव्ह करा, नंतर पाठवा.", write: "लिहा", send: "पाठवा", cat: "श्रेणी:", msg: "संदेश:", save: "सेव्ह करा", dl_title: "डाउनलोड होत आहे...", dl_text: "कृपया प्रतीक्षा करा...", empty_disc: "रिकामी डिस्क", full_disc: "पूर्ण डिस्क", status_sending: "पाठवत आहे...", status_sent: "प्रक्रिया पूर्ण झाली" }
     };
 
-    function updateLanguage(lang) {
+    function updateLanguage(lang, forceSelectValue = null) {
       if(!translations[lang]) return;
       const t = translations[lang];
       if(document.getElementById('t-subtitle')) document.getElementById('t-subtitle').textContent = t.subtitle;
+      if(document.getElementById('t-legend')) document.getElementById('t-legend').textContent = t.legend;
       if(document.getElementById('t-archive')) document.getElementById('t-archive').textContent = t.archive;
       if(document.getElementById('t-eject')) document.getElementById('t-eject').textContent = t.eject;
       if(document.getElementById('t-broken')) document.getElementById('t-broken').textContent = t.broken;
@@ -564,51 +709,49 @@
 
       if(document.getElementById('t-download-title')) document.getElementById('t-download-title').textContent = t.dl_title;
       if(document.getElementById('t-download-text')) document.getElementById('t-download-text').textContent = t.dl_text;
+      if(document.getElementById('t-health_warning')) document.getElementById('t-health_warning').textContent = t.health_warning;
       
-
-
-      localStorage.setItem('lang', lang);
-      document.getElementById('language-select').value = lang;
+      if (forceSelectValue) {
+          document.getElementById('language-select').value = forceSelectValue;
+      }
+      
       const iframe = document.getElementById('app-iframe');
-      if(iframe document.getElementById('language-select').value = lang;document.getElementById('language-select').value = lang; iframe.contentWindow) iframe.contentWindow.postMessage({type: 'LANG_CHANGE', lang: lang}, '*');
+      if(iframe && iframe.contentWindow) iframe.contentWindow.postMessage({type: 'LANG_CHANGE', lang: lang}, '*');
     }
     
     function getLocalizedUrl(url) {
-      if (url.startsWith('http') || url === 'trap') return url;
-      const lang = localStorage.getItem('lang') || 'tr';
-      return `/${lang}${url.startsWith('/') ? url : '/' + url}`;
+      if (url.startsWith('http') || url.startsWith('data:') || url === 'trap') return url;
+      return url.startsWith('/') ? url : '/' + url;
     }
 
-    // Language routing logic
-    const pathSegments = window.location.pathname.split('/').filter(Boolean);
-    let urlLang = null;
-    
-    // Check if the first path segment is a language code
-    if (pathSegments.length > 0 && translations[pathSegments[0]]) {
-        urlLang = pathSegments[0];
+    // Language initialization logic
+    let savedLang = localStorage.getItem('lang') || 'auto';
+    let detectedLang = savedLang;
+    if (savedLang === 'auto') {
+        const browserLang = navigator.language.split('-')[0];
+        detectedLang = translations[browserLang] ? browserLang : 'en';
     }
 
-    let activeLang = urlLang || localStorage.getItem('lang') || 'tr';
-    
-    if (window.location.pathname === '/' || window.location.pathname === '') {
-        window.history.replaceState(null, '', '/' + activeLang + '/');
-    } else if (urlLang && urlLang !== localStorage.getItem('lang')) {
-        localStorage.setItem('lang', urlLang);
-    }
-
-    updateLanguage(activeLang);
+    updateLanguage(detectedLang, savedLang);
 
     document.getElementById('language-select').addEventListener('change', (e) => {
-      const newLang = e.target.value;
-      localStorage.setItem('lang', newLang);
+      const selectedValue = e.target.value;
+      localStorage.setItem('lang', selectedValue);
       
-      const segments = window.location.pathname.split('/').filter(Boolean);
-      if (segments.length > 0 && translations[segments[0]]) {
-          segments[0] = newLang;
-      } else {
-          segments.unshift(newLang);
+      let newLang = selectedValue;
+      if (newLang === 'auto') {
+          const browserLang = navigator.language.split('-')[0];
+          newLang = translations[browserLang] ? browserLang : 'en';
       }
-      window.location.href = '/' + segments.join('/');
+      
+      // Black Screen Transition Effect
+      const blackScreen = document.getElementById('black-screen');
+      blackScreen.style.display = 'block';
+      
+      setTimeout(() => {
+          updateLanguage(newLang, selectedValue);
+          blackScreen.style.display = 'none';
+      }, 300);
     });
     
     // Original JS starts here
@@ -620,23 +763,51 @@
       themeIcon.textContent = 'light_mode';
     }
     
-    // Toggle Dark Mode
+    // Toggle Dark Mode + Glitch Easter Egg
+    let themeClicks = 0;
+    let themeClickTimer = null;
+
     themeToggle.addEventListener('click', () => {
+      themeClicks++;
+      clearTimeout(themeClickTimer);
+      themeClickTimer = setTimeout(() => { themeClicks = 0; }, 2500);
+
+      if (themeClicks >= 8) {
+        // Destroy button with glitch animation
+        themeToggle.style.transition = 'transform 0.4s ease, opacity 0.4s ease';
+        themeToggle.style.transform = 'scale(0) rotate(720deg)';
+        themeToggle.style.opacity = '0';
+        setTimeout(() => { themeToggle.style.display = 'none'; }, 400);
+
+        // Enter split glitch theme
+        document.body.classList.remove('dark-mode');
+        document.body.classList.add('split-theme');
+        return;
+      }
+
       document.body.classList.toggle('dark-mode');
       const isDark = document.body.classList.contains('dark-mode');
       localStorage.setItem('theme', isDark ? 'dark' : 'light');
       themeIcon.textContent = isDark ? 'dark_mode' : 'light_mode';
     });
 
-    
+    // Render Discs: Floppies always on top, CDs always below
+    const floppies = projects.filter(p => p.type !== 'cd');
+    const cds = projects.filter(p => p.type === 'cd');
+    const orderedProjects = [...floppies, ...cds];
 
-    // Render Discs
-    projects.forEach(p => {
+    orderedProjects.forEach(p => {
+      // Row break to ensure CDs always start on a new row below floppies
+      if (p === cds[0] && floppies.length > 0) {
+        const rowBreak = document.createElement('div');
+        rowBreak.style.cssText = 'flex-basis: 100%; width: 100%; height: 10px; pointer-events: none;';
+        discsContainer.appendChild(rowBreak);
+      }
+
       const wrapper = document.createElement('div');
       wrapper.className = 'floppy-wrapper';
       wrapper.draggable = true;
       wrapper.id = 'disc-' + p.id;
-      
       
       wrapper.addEventListener('dblclick', () => {
         const fakeEvent = { dataTransfer: { getData: () => p.id } };
@@ -648,12 +819,21 @@
         e.dataTransfer.effectAllowed = 'move';
       });
 
-      wrapper.innerHTML = `
-        <img src="/assets/discs/floppy-disc.png" class="floppy-img" alt="Floppy Disc" width="150" height="150">
-        <div class="floppy-label">
-          <div class="floppy-title">${p.title}</div>
-        </div>
-      `;
+      if (p.type === 'cd') {
+        wrapper.innerHTML = `
+          <img src="/assets/cd/cd.png" class="cd-img" alt="CD" width="150" height="150">
+          <div class="floppy-label" style="top: 60%; transform: none; width: 100%; left: 0;">
+            <div class="floppy-title" style="color: #fff; text-shadow: 1px 1px 2px #000;">${p.title}</div>
+          </div>
+        `;
+      } else {
+        wrapper.innerHTML = `
+          <img src="/assets/discs/floppy-disc.png" class="floppy-img" alt="Floppy Disc" width="150" height="150">
+          <div class="floppy-label">
+            <div class="floppy-title">${p.title}</div>
+          </div>
+        `;
+      }
       discsContainer.appendChild(wrapper);
     });
 
@@ -670,6 +850,20 @@
     if (idkDisc) {
       idkDisc.addEventListener('dragstart', (e) => {
         e.dataTransfer.setData('text/plain', 'idk15052007');
+        e.dataTransfer.effectAllowed = 'move';
+      });
+    }
+    const plansDisc = document.getElementById('disc-plans');
+    if (plansDisc) {
+      plansDisc.addEventListener('dragstart', (e) => {
+        e.dataTransfer.setData('text/plain', 'plans');
+        e.dataTransfer.effectAllowed = 'move';
+      });
+    }
+    const hubIcon = document.getElementById('hub-easteregg-icon');
+    if (hubIcon) {
+      hubIcon.addEventListener('dragstart', (e) => {
+        e.dataTransfer.setData('text/plain', 'aligaliphub');
         e.dataTransfer.effectAllowed = 'move';
       });
     }
@@ -703,77 +897,197 @@
 
       let project = projects.find(p => p.id === projectId);
       if (projectId === 'contact') {
-         project = { id: 'contact', title: 'contact.exe', url: 'https://forms.gle/2yAQQzSyd6Gdju5S6', isDownload: true };
+         project = { id: 'contact', title: 'contact.exe', url: 'https://forms.gle/2yAQQzSyd6Gdju5S6', isDownload: true, type: 'floppy' };
       } else if (projectId === 'idk15052007') {
-         project = { id: 'idk15052007', title: 'idk15052007.exe', url: 'trap', isDownload: true };
+         project = { id: 'idk15052007', title: 'gift_disc.exe', url: 'trap', isDownload: true, type: 'cd' };
+      } else if (projectId === 'easteregg') {
+          let audio = document.getElementById('usb-connect-audio');
+          if (!audio) {
+              audio = new Audio('/assets/10-usb-connect.mp3');
+              audio.id = 'usb-connect-audio';
+              document.body.appendChild(audio);
+              
+              const AudioContext = window.AudioContext || window.webkitAudioContext;
+              const audioCtx = new AudioContext();
+              const source = audioCtx.createMediaElementSource(audio);
+              const gainNode = audioCtx.createGain();
+              gainNode.gain.value = 1.15;
+              source.connect(gainNode);
+              gainNode.connect(audioCtx.destination);
+              audio.audioCtx = audioCtx;
+          }
+          audio.currentTime = 0;
+          if (audio.audioCtx && audio.audioCtx.state === 'suspended') audio.audioCtx.resume();
+          audio.play().catch(console.error);
+
+         const now = new Date();
+         const isAprilFools = now.getMonth() === 3 && now.getDate() === 1;
+         
+         const waitText = "How did you find this page?! You weren't supposed to find it. Anyway, if you found this page, please be here on April 1st at 12:00 PM (Turkish time). wait i've changed my mind, i think you'll miss it. Be here directly on April 1st.";
+         const giftText = "Thank you for being here on April 1st, here's your gift; [New floppy disc added]";
+         
+         const htmlContent = `<html><body style="background:black;color:#0f0;font-family:monospace;padding:20px;text-align:center;display:flex;flex-direction:column;justify-content:center;height:100%;box-sizing:border-box;"><h1>wHaT thE HaCK?!</h1><p>${isAprilFools ? giftText : waitText}</p></body></html>`;
+         
+         project = { 
+             id: 'easteregg', 
+             title: 'Secret Page', 
+             url: 'data:text/html;charset=utf-8,' + encodeURIComponent(htmlContent), 
+             isDownload: false,
+             type: 'usb'
+         };
+         
+         if (isAprilFools) {
+             const giftDisc = document.getElementById('disc-idk15052007');
+             if (giftDisc) giftDisc.style.display = 'block';
+         }
+      } else if (projectId === 'plans') {
+         project = { 
+             id: 'plans', 
+             title: '???.exe', 
+             type: 'floppy',
+             isCustomAction: true,
+             customAction: function() {
+                 const video = document.createElement('video');
+                 video.src = '/assets/error.webm';
+                 video.style.display = 'none';
+                 video.muted = false;
+                 
+                 const canvas = document.createElement('canvas');
+                 canvas.style.position = 'fixed';
+                 canvas.style.top = '0';
+                 canvas.style.left = '0';
+                 canvas.style.width = '100vw';
+                 canvas.style.height = '100vh';
+                 canvas.style.zIndex = '999999';
+                 canvas.style.pointerEvents = 'none';
+                 document.body.appendChild(canvas);
+                 document.body.appendChild(video);
+
+                 const ctx = canvas.getContext('2d', { willReadFrequently: true });
+                 
+                 video.play();
+                 
+                 function processFrame() {
+                     if (video.paused || video.ended) return;
+                     if (canvas.width !== video.videoWidth && video.videoWidth > 0) canvas.width = video.videoWidth;
+                     if (canvas.height !== video.videoHeight && video.videoHeight > 0) canvas.height = video.videoHeight;
+                     
+                     if (canvas.width > 0 && canvas.height > 0) {
+                         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                         const frame = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                         const length = frame.data.length / 4;
+                         
+                         for (let i = 0; i < length; i++) {
+                             const r = frame.data[i * 4 + 0];
+                             const g = frame.data[i * 4 + 1];
+                             const b = frame.data[i * 4 + 2];
+                             // Green screen keying
+                             if (g > 100 && r < 120 && b < 120) {
+                                 frame.data[i * 4 + 3] = 0;
+                             }
+                         }
+                         ctx.putImageData(frame, 0, 0);
+                     }
+                     requestAnimationFrame(processFrame);
+                 }
+                 
+                 video.addEventListener('play', () => {
+                     processFrame();
+                 });
+                 
+                 video.addEventListener('ended', () => {
+                     canvas.remove();
+                     video.remove();
+                     const blackScreen = document.getElementById('black-screen');
+                     blackScreen.style.display = 'block';
+                     setTimeout(() => {
+                         blackScreen.style.display = 'none';
+                         ejectDisc();
+                     }, 1000);
+                 });
+             }
+         };
       }
+
+      // Amazon fallback for ANY other dragged text that isn't a project
+      if (!project && projectId) {
+          project = { id: 'amazon-link', title: 'Buy Lenovo LOQ', url: 'https://www.amazon.com/s?k=Lenovo+LOQ+15IRX10', isDownload: false, type: 'floppy' };
+      }
+      
       if (!project) return;
+      
+      // Hide dropped floppy (if it exists)
+      try {
+          const discElDrop = document.getElementById('disc-' + project.id);
+          if (discElDrop) {
+              discElDrop.style.display = 'none';
+          }
+      } catch (e) {}
 
       // Insert Disc
       currentDisc = projectId;
       
-      // Hide dropped floppy
-      document.getElementById('disc-' + projectId).style.display = 'none';
-      
       // Change reader image
-      readerImg.src = '/assets/discs/disc-reader-and-disc.png';
+      if (project.type === 'cd') {
+          readerImg.src = '/assets/cd/disc-reader-cd.png';
+      } else if (project.type !== 'usb') {
+          readerImg.src = '/assets/discs/disc-reader-and-disc.png';
+      }
 
-      // Play audio sequence
-      discAudio.currentTime = 0;
-      fanAudio.currentTime = 0;
-      discAudio.play().catch(console.error);
-      
       discAudio.onended = () => {
         if (currentDisc) { // still inside
-          if (project.isDownload) {
-             // Show Win98 progress
-             document.getElementById('win98-download').style.display = 'block';
-             const previewDiv = document.getElementById('download-preview');
-             const previewIframe = document.getElementById('preview-iframe');
-             
-             if (project.id === 'contact') {
-                 document.getElementById('t-download-title').textContent = 'İletişim Başlatılıyor...';
-                 document.getElementById('t-download-text').textContent = 'contact.exe yükleniyor...';
-                 previewDiv.style.display = 'none';
-             } else if (project.id === 'idk15052007') {
-                 document.getElementById('t-download-title').textContent = 'Bilinmeyen Dosya...';
-                 document.getElementById('t-download-text').textContent = 'idk15052007.exe yükleniyor...';
-                 previewDiv.style.display = 'none';
-             } else if (project.id === 'retroclock') {
-                 document.getElementById('t-download-title').textContent = 'İndiriliyor...';
-                 document.getElementById('t-download-text').textContent = project.title + ' yükleniyor...';
-                 previewDiv.style.display = 'block';
-                 previewIframe.src = getLocalizedUrl(project.url);
-             } else {
-                 document.getElementById('t-download-title').textContent = 'İndiriliyor...';
-                 document.getElementById('t-download-text').textContent = project.title + ' yükleniyor...';
-                 previewDiv.style.display = 'none';
-             }
-             document.getElementById('win98-progress-bar').style.width = '0%';
-             let prog = 0;
-             let interval = setInterval(() => {
-                prog += 10;
-                document.getElementById('win98-progress-bar').style.width = prog + '%';
-                 if(prog >= 100) {
-                   clearInterval(interval);
-                   setTimeout(() => {
-                     document.getElementById('win98-download').style.display = 'none';
-                     previewIframe.src = 'about:blank'; // cleanup
-                     if (project.url === 'trap') {
-                         openApp('trap');
-                     } else {
-                         window.open(getLocalizedUrl(project.url), '_blank');
-                         ejectDisc();
-                     }
-                   }, 500);
-                }
-             }, 200);
+          const dlTexts = { en: "To download, go to this link: ", tr: "İndirmek için şu bağlantıya gidin: ", zh: "要下载，请转到此链接：", hi: "डाउनलोड करने के लिए, इस लिंक पर जाएं: ", es: "Para descargar, vaya a este enlace: ", fr: "Pour télécharger, allez sur ce lien: ", ar: "للتنزيل، انتقل إلى هذا الرابط: ", bn: "ডাউনলোড করতে, এই লিঙ্কে যান: ", ru: "Чтобы скачать, перейдите по этой ссылке: ", pt: "Para baixar, vá para este link: ", ur: "ڈاؤن لوڈ کرنے کے لیے، اس لنک پر جائیں: ", id: "Untuk mengunduh, buka tautan ini: ", de: "Zum Herunterladen gehen Sie zu diesem Link: ", ja: "ダウンロードするには、このリンクにアクセスしてください：", mr: "डाउनलोड करण्यासाठी, या लिंकवर जा: " };
+          let l = document.getElementById('language-select').value;
+          if (l === 'auto') l = navigator.language.split('-')[0];
+          if (!dlTexts[l]) l = 'en';
+
+          const dlContainer = document.getElementById('project-download-link');
+          if (dlContainer) {
+             dlContainer.innerHTML = dlTexts[l] + `<a href="${project.url}" target="_blank" style="color:#fff; text-decoration:underline;">${project.title}</a>`;
+             dlContainer.style.display = 'block';
+          }
+
+          if (project.isCustomAction) {
+             project.customAction();
           } else {
              fanAudio.play().catch(console.error);
-             openApp(getLocalizedUrl(project.url));
+             
+             document.getElementById('t-download-title').textContent = 'Yükleniyor...';
+             document.getElementById('t-download-text').textContent = project.title + ' hazırlanıyor...';
+             document.getElementById('download-preview').style.display = 'none';
+             document.getElementById('win98-download').style.display = 'block';
+             const progressBar = document.getElementById('win98-progress-bar');
+             progressBar.style.width = '0%';
+             let prog = 0;
+             window.downloadInterval = setInterval(() => {
+                prog += 5;
+                progressBar.style.width = prog + '%';
+                if (prog >= 100) {
+                   clearInterval(window.downloadInterval);
+                   setTimeout(() => {
+                      document.getElementById('win98-download').style.display = 'none';
+                      if (project.type === 'cd' || (project.url && project.url.endsWith('.AppImage'))) {
+                          const fakeScreen = `<html><body style="background:#000;color:#0f0;display:flex;align-items:center;justify-content:center;height:100vh;font-family:monospace;margin:0;overflow:hidden;"><h1>${project.title}</h1></body></html>`;
+                          openApp('data:text/html;charset=utf-8,' + encodeURIComponent(fakeScreen));
+                      } else {
+                          openApp(getLocalizedUrl(project.url));
+                      }
+                   }, 300);
+                }
+             }, 100);
           }
         }
       };
+
+      if (project.type !== 'usb') {
+          // Play audio sequence
+          discAudio.currentTime = 0;
+          fanAudio.currentTime = 0;
+          discAudio.play().catch(console.error);
+      } else {
+          if (discAudio.onended) discAudio.onended();
+      }
+
     }
 
     function ejectDisc() {
@@ -787,8 +1101,14 @@
       discAudio.pause();
       fanAudio.pause();
       
-      // Show disc again
-      document.getElementById('disc-' + currentDisc).style.display = 'block';
+      const dlContainer = document.getElementById('project-download-link');
+      if (dlContainer) dlContainer.style.display = 'none';
+      
+      // Show disc again if it exists
+      const discEl = document.getElementById('disc-' + currentDisc);
+      if (discEl) {
+          discEl.style.display = 'block';
+      }
       currentDisc = null;
 
       // Reset reader image
@@ -834,47 +1154,118 @@
     }
 
 
-    // Mobile Touch Drag Delay Logic for all discs (Dynamic + Static)
+    // Mobile Touch Drag Delay Logic Removed
     document.querySelectorAll('.floppy-wrapper').forEach(w => {
-      // Ensure all disks have double click (the dynamic ones already have it, but static ones need it)
+      // Ensure all disks have double click
       w.ondblclick = (e) => {
         let discId = w.id.replace('disc-', '');
         if (discId) dropHandler({ dataTransfer: { getData: () => discId } });
       };
-      
-            // Mobile Drag Delay Setup
-      const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
-      
-      if (isTouchDevice) {
-          w.draggable = false; 
-          let dragTimeout;
-          w.addEventListener('touchstart', function(e) {
-             if (w.getAttribute('data-drag-ready') !== 'true') {
-                 dragTimeout = setTimeout(() => {
-                     w.draggable = true;
-                     w.setAttribute('data-drag-ready', 'true');
-                     if(navigator.vibrate) navigator.vibrate(30);
-                 }, 400); // 400ms hold to drag
-             }
-          }, {passive: true});
-          
-          w.addEventListener('touchend', function(e) {
-             clearTimeout(dragTimeout);
-             setTimeout(() => {
-                 w.draggable = false;
-                 w.removeAttribute('data-drag-ready');
-             }, 100);
-          }, {passive: true});
-          
-          w.addEventListener('touchmove', function(e) {
-             if (w.getAttribute('data-drag-ready') !== 'true') {
-                 clearTimeout(dragTimeout);
-             }
-          }, {passive: true});
-      } else {
-          w.draggable = true;
-      }
+      w.draggable = true;
     });
+
+    // Mobile logic for secret icon
+    const secretIconEl = document.getElementById('secret-icon');
+    if (secretIconEl) {
+        secretIconEl.ondblclick = (e) => {
+            dropHandler({ dataTransfer: { getData: () => 'easteregg' }, preventDefault: () => {} });
+        };
+        secretIconEl.draggable = true;
+    }
+    
+    // Retro Win98 Scrollbar Controller
+    (function() {
+      const track = document.getElementById('sb-track');
+      const thumb = document.getElementById('sb-thumb');
+      const upBtn = document.getElementById('sb-up');
+      const downBtn = document.getElementById('sb-down');
+
+      if (!track || !thumb) return;
+
+      function updateThumb() {
+        const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+        if (docHeight <= 0) {
+          thumb.style.top = '0px';
+          return;
+        }
+        const trackHeight = track.clientHeight - thumb.clientHeight;
+        const progress = Math.min(1, Math.max(0, window.scrollY / docHeight));
+        thumb.style.top = (progress * trackHeight) + 'px';
+      }
+
+      window.addEventListener('scroll', updateThumb, { passive: true });
+      window.addEventListener('resize', updateThumb);
+
+      if (upBtn) {
+        upBtn.addEventListener('click', () => {
+          window.scrollBy({ top: -140, behavior: 'smooth' });
+        });
+      }
+      if (downBtn) {
+        downBtn.addEventListener('click', () => {
+          window.scrollBy({ top: 140, behavior: 'smooth' });
+        });
+      }
+
+      // Drag / touch on track & thumb
+      let isDragging = false;
+      let startY = 0;
+      let startScrollY = 0;
+
+      function onPointerDown(e) {
+        isDragging = true;
+        const clientY = (e.touches && e.touches.length > 0) ? e.touches[0].clientY : e.clientY;
+        startY = clientY;
+        startScrollY = window.scrollY;
+
+        // If clicked on track directly (outside thumb), jump scroll immediately
+        if (e.target === track) {
+          const rect = track.getBoundingClientRect();
+          const clickY = clientY - rect.top;
+          const trackHeight = track.clientHeight - thumb.clientHeight;
+          if (trackHeight > 0) {
+            const ratio = Math.min(1, Math.max(0, (clickY - thumb.clientHeight / 2) / trackHeight));
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            window.scrollTo({ top: ratio * docHeight, behavior: 'smooth' });
+          }
+        }
+        if (e.cancelable) e.preventDefault();
+      }
+
+      function onPointerMove(e) {
+        if (!isDragging) return;
+        const clientY = (e.touches && e.touches.length > 0) ? e.touches[0].clientY : e.clientY;
+        const deltaY = clientY - startY;
+        const trackHeight = track.clientHeight - thumb.clientHeight;
+        if (trackHeight <= 0) return;
+        const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+        const scrollDelta = (deltaY / trackHeight) * docHeight;
+        window.scrollTo(0, startScrollY + scrollDelta);
+        if (e.cancelable) e.preventDefault();
+      }
+
+      function onPointerUp() {
+        isDragging = false;
+      }
+
+      track.addEventListener('mousedown', onPointerDown);
+      track.addEventListener('touchstart', onPointerDown, { passive: false });
+      window.addEventListener('mousemove', onPointerMove);
+      window.addEventListener('touchmove', onPointerMove, { passive: false });
+      window.addEventListener('mouseup', onPointerUp);
+      window.addEventListener('touchend', onPointerUp);
+
+      setTimeout(updateThumb, 500);
+    })();
+
+    function cancelDownload() {
+      if (window.downloadInterval) {
+        clearInterval(window.downloadInterval);
+      }
+      document.getElementById('win98-download').style.display = 'none';
+      document.getElementById('preview-iframe').src = 'about:blank';
+      ejectDisc();
+    }
   </script>
   </div>
 </body>
